@@ -1,0 +1,18 @@
+[submodule "Document"]
+	path = Document
+	url = https://github.com/abovsemiconductor/AUDK32-Document.git/
+[submodule "Example/Source"]
+	path = Example/Source
+	url = https://github.com/abovsemiconductor/AUDK32-ExampleSource.git/
+[submodule "Framework/CMSIS/Core"]
+	path = Framework/CMSIS/Core
+	url = https://github.com/abovsemiconductor/AUDK32-CmsisCore.git/
+[submodule "Platform/HAL"]
+	path = Platform/HAL
+	url = https://github.com/abovsemiconductor/AUDK32-HAL.git/
+[submodule "Platform/Library/ABOV"]
+	path = Platform/Library/ABOV
+	url = https://github.com/abovsemiconductor/AUDK32-Library.git/
+[submodule "Tool/OpenOCD"]
+	path = Tool/OpenOCD
+	url = https://github.com/abovsemiconductor/AUDK32-OpenOCD.git/
