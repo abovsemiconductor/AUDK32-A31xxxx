@@ -1,0 +1,236 @@
+; A. Description
+;    This script automatically executes WDT, FRT, CRC, CFMC and some of SCU Tera Term example scripts.
+;
+; B. Prerequisite Example (abov_example_config.h)
+;    1. WDT
+;    2. FRT
+;    3. CRC
+;    4. Flash
+;    5. SCU
+;
+; C. Port Connection
+;
+
+timeout=600
+Passstr='===== Test Result : Pass ====='#13#10
+Failstr='===== Test Result : Fail ====='#13#10
+Reviewstr='===== Test Result : Need Review ===='#13#10
+NeedReview=0
+
+getdir mdir
+foldercreate 'Result'
+
+fileret='01_Autotest_Result_WDT_FRT_CRC_CFMC_SCU'
+sprintf2 retfilename '%s\Result\%s.txt' mdir fileret
+sprintf2 delfilename 'Result\%s.txt' fileret
+filedelete delfilename
+fileopen frethnd retfilename 0
+
+call tcwdt
+call tcfrt
+call tccrc
+call tccfmc
+call tcscu
+
+fileclose frethnd
+dispstr 'End of 1. Auto Test WDT/FRT/CRC/CFMC/SCU'
+dispstr 10
+dispstr 'Must process the remained SCU TC.'
+end
+
+
+:tcwdt
+; ===== START : TestCase WDT =====
+dispstr 10 10
+dispstr '===== START : TestCase WDT ====='
+dispstr 10
+
+ipstr='WDT'
+foldercreate ipstr
+
+filestr='01_wdt_intr_maskable_underflow'
+chkstr='WDT : (0) U evt fired'
+delay=3
+call dotest
+
+filestr='02_wdt_intr_non_maskable_underflow'
+chkstr='WDT : (0) U evt fired'
+delay=5
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_wdt_intr_reset'
+chkstr='= Executable module list ='
+delay=12
+call dotest
+
+; ===== END : TestCase WDT =====
+dispstr 10
+dispstr '===== END : TestCase WDT ====='
+dispstr 10
+return
+
+
+:tcfrt
+; ===== START : TestCase FRT =====
+dispstr 10 10
+dispstr '===== START : TestCase FRT ====='
+dispstr 10
+
+ipstr='FRT'
+foldercreate ipstr
+
+filestr='01_frt_intr_match'
+chkstr='FRT : (0) M evt fired'
+delay=3
+call dotest
+
+filestr='02_frt_intr_overflow'
+chkstr='FRT : (0) O(free) evt fired'
+delay=150
+call dotest
+
+filestr='03_frt_intr_non_maskable_match'
+chkstr='FRT : (0) M evt fired'
+delay=3
+call dotest
+
+; ===== END : TestCase FRT =====
+dispstr 10
+dispstr '===== END : TestCase FRT ====='
+dispstr 10
+return
+
+
+:tccrc
+; ===== START : TestCase CRC =====
+dispstr 10 10
+dispstr '===== START : TestCase CRC ====='
+dispstr 10
+
+ipstr='CRC'
+foldercreate ipstr
+
+filestr='01_crc_poll_poly_8'
+chkstr='0x8f'
+delay=1
+call dotest
+
+filestr='02_crc_poll_poly_ccitt'
+chkstr='0x7969'
+delay=1
+call dotest
+
+filestr='03_crc_poll_poly_16'
+chkstr='0x826e'
+delay=1
+call dotest
+
+filestr='04_crc_poll_poly_32'
+chkstr='0xccdcd51e'
+delay=1
+call dotest
+
+filestr='05_crc_dma_poly_32'
+chkstr='0xccdcd51e (ISR)'
+delay=1
+call dotest
+
+filestr='06_crc_dma_non_maskable_poly_32'
+chkstr='0xccdcd51e (ISR)'
+delay=1
+call dotest
+
+; ===== END : TestCase CRC =====
+dispstr 10
+dispstr '===== END : TestCase CRC ====='
+dispstr 10
+return
+
+
+:tccfmc
+; ===== START : TestCase CFMC =====
+dispstr 10 10
+dispstr '===== START : TestCase CFMC ====='
+dispstr 10
+
+ipstr='CFMC'
+foldercreate ipstr
+
+filestr='01_code_flash'
+chkstr='End of Flash'
+delay=1
+NeedReview=1
+call dotest
+NeedReview=0
+
+; ===== END : TestCase CFMC =====
+dispstr 10
+dispstr '===== END : TestCase CFMC ====='
+dispstr 10
+return
+
+
+:tcscu
+; ===== START : TestCase SCU =====
+dispstr 10 10
+dispstr '===== START : TestCase SCU ====='
+dispstr 10
+
+ipstr='SCU'
+foldercreate ipstr
+
+filestr='08_scu_reset'
+chkstr='= Executable module list ='
+delay=3
+call dotest
+
+; ===== END : TestCase SCU =====
+dispstr 10
+dispstr '===== END : TestCase SCU ====='
+dispstr 10
+return
+
+:dotest
+sprintf2 delfilename '%s\%s.log' ipstr filestr
+filedelete delfilename
+sprintf2 logfilename '%s\%s\%s.log' mdir ipstr filestr
+logopen logfilename 0 0
+sprintf2 logstr 'Test %s' filestr
+logwrite logstr
+sprintf2 tcfile '..\%s\%s.ttl' ipstr filestr 
+include tcfile
+pause delay
+logclose
+call decision
+return
+
+:decision
+timeout=600
+fileopen fhandle logfilename 0
+if NeedReview == 1 then
+    resultstr=Reviewstr
+else
+    filestrseek fhandle chkstr
+    if result=0 then
+        resultstr=Failstr
+    else 
+        resultstr=Passstr
+    endif
+endif
+
+fileseek fhandle 0 0
+do
+    filereadln fhandle line
+    filewriteln frethnd line
+loop while result == 0
+filewriteln frethnd resultstr
+filewriteln frethnd 0
+filewriteln frethnd 0
+fileclose fhandle
+NeedReview=0
+resultstr=''
+pause 1
+
+return

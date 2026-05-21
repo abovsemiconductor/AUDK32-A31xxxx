@@ -1,0 +1,108 @@
+; A. Description
+;    A list of commands here configures timer1 and generates a periodic interrupt based on external clock source.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer1
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer10 : PE6/PE6 (Output/Capture Input/External Clock Input)
+;    2. Timer11 : PE7/PE7 (Output/Capture Input/External Clock Input)
+;
+; E. Port Connection
+;    1. PE7 (Timer11 Output) ----> PE6 (Timer10 External Clock Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer10
+; 1. Channel                   : 0 (Timer10)
+;
+; 2. Clock                     : [ 0 e f 0 ]
+;    Source                    : e (External Clock Input) 
+;    External Clock Input Edge : f (Falling) 
+;    Timer1 Pre-Divide         : 0
+;
+; 3. Config                    : [ 0 i p h 2 2 -io i ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Periodic)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 2
+;    B Data                    : 2
+;    Port In/Out (-io)         : i (Input)
+;
+; Timer11
+; 1. Channel                   : 1 (Timer11)
+;
+; 2. Clock                     : [ 1 m h 10 1000 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 32MHz)
+;    Source Divide             : 10 
+;    Timer1 Pre-Divide         : 1000 (MCCR Clock / 10) / 1000
+;
+; 3. Config                    : [ 1 i p h 3200 3200 -io o ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 3200
+;    B Data                    : 3200
+;    Port In/Out (-io)         : o (Output)
+;
+; PCU (PE7)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 7 a 2 ]
+;    Pin Number                : 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 (T1IO)
+;
+; PCU (PE6)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 6 a 2 ]
+;    Pin Number                : 6
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 (T0IO)
+
+
+; PCU (PE7)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 4 7 a 2'
+mpause 30
+
+; PCU (PE6)
+mpause 30
+sendln 'port 4 6 a 2'
+mpause 30
+
+; Timer11
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 m h 10 1000'
+mpause 30
+sendln 'config 1 i p h 3200 3200 -io o'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 1'
+mpause 30
+
+; Timer10
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 e f 0'
+mpause 30
+sendln 'config 0 i p h 2 2 -io i'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

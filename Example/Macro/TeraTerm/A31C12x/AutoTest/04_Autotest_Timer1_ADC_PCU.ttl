@@ -1,0 +1,291 @@
+; A. Description
+;    This script automatically executes some of TIMER1, ADC and PCU Tera Term example scripts.
+;
+; B. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;    2. ADC
+;    3. Timer1
+;
+; C. Port Connection
+;    1. ADC/Timer1
+;       : PC0 (Timer15 Output) ----> PE2 (AN16)
+;    2. PCU/Timer1
+;       : PE5 (Timer14 Output) ----> PE4 (Input)
+;
+
+timeout=600
+Passstr='===== Test Result : Pass ====='#13#10
+Failstr='===== Test Result : Fail ====='#13#10
+Reviewstr='===== Test Result : Need Review ===='#13#10
+NeedReview=0
+
+getdir mdir
+foldercreate 'Result'
+
+fileret='04_Autotest_Result_Timer1_ADC_PCU'
+sprintf2 retfilename '%s\Result\%s.txt' mdir fileret
+sprintf2 delfilename 'Result\%s.txt' fileret
+filedelete delfilename
+fileopen frethnd retfilename 0
+
+call tcpcu
+call tctimer1
+call tcadc
+
+fileclose frethnd
+dispstr 'End of 5. Auto Test Timer1/ADC/PCU'
+dispstr 10
+dispstr 'Must process the remained Timer1 TC.'
+end
+
+
+:tcpcu
+; ===== START : TestCase PCU =====
+dispstr 10 10
+dispstr '===== START : TestCase PCU ====='
+dispstr 10
+
+ipstr='PCU'
+foldercreate ipstr
+
+filestr='02_pcu_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='03_pcu_input_port_intr_with_timer1'
+chkstr='PCU : Port-4 evt fire(0x200)'
+delay=3
+call dotest
+sendln 'stop 4'
+pause 1
+
+ipstr='PCU'
+filestr='04_pcu_output_port_level_change_and_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='05_pcu_input_port_intr_with_output_port'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='06_pcu_input_port_intr_non_maskable_with_output_port'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+; ===== END : TestCase PCU =====
+dispstr 10
+dispstr '===== END : TestCase PCU ====='
+dispstr 10
+return
+
+
+:tctimer1
+; ===== START : TestCase Timer1 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer1 ====='
+dispstr 10
+
+ipstr='Timer1'
+foldercreate ipstr
+
+filestr='01_timer1_intr_period'
+chkstr='TIMER1 : (0) P evt fire'
+delay=2
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_timer1_intr_oneshot'
+chkstr='TIMER1 : (0) P evt fire'
+delay=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer1_intr_pwm'
+chkstr='TIMER1 : (0) PWM P evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='04_timer1_intr_capture'
+chkstr='TIMER1 : (0) C-A evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+sendln 'stop 1'
+pause 1
+
+filestr='06_timer1_intr_ext_clk_input_with_timer1'
+chkstr='TIMER1 : (1) P evt fire'
+delay=3
+call dotest
+sendln 'stop 1'
+pause 1
+sendln 'stop 0'
+pause 1
+
+filestr='07_timer1_intr_non_maskable_period'
+chkstr='TIMER1 : (2) P evt fire'
+delay=3
+call dotest
+sendln 'stop 2'
+pause 1
+
+; ===== END : TestCase Timer1 =====
+dispstr 10
+dispstr '===== END : TestCase Timer1 ====='
+dispstr 10
+return
+
+
+:tcadc
+; ===== START : TestCase ADC =====
+dispstr 10 10
+dispstr '===== START : TestCase ADC ====='
+dispstr 10
+
+ipstr='ADC'
+foldercreate ipstr
+
+filestr='01_adc_intr_single_1_sequence_data_with_timer1_input'
+chkstr=''
+delay=1
+NeedReview=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_adc_intr_sequence_8_sequence_data'
+chkstr=''
+delay=1
+NeedReview=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_adc_intr_burst_8_sequence_data'
+chkstr=''
+delay=1
+NeedReview=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='04_adc_intr_multiple_8_sequence_data'
+chkstr=''
+delay=1
+NeedReview=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='05_adc_intr_multiple_8_sequence_data_with_timer1'
+chkstr=''
+delay=1
+NeedReview=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='08_adc_intr_single_1_sequence_data_compare_up_with_timer11_event_timer10_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+sendln 'stop 0'
+mpause 50
+sendln 'stop 1'
+pause 1
+
+filestr='09_adc_intr_single_1_sequence_data_compare_down_with_timer11_event_timer10_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+sendln 'stop 0'
+mpause 50
+sendln 'stop 1'
+pause 1
+
+filestr='11_adc_intr_non_maskable_multiple_8_sequence_data_with_timer1'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+sendln 'stop 0'
+mpause 50
+sendln 'stop 1'
+pause 1
+
+filestr='12_adc_dma_non_maskable_multiple_8_sequence_data_with_timer1'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+sendln 'stop 0'
+mpause 50
+sendln 'stop 1'
+pause 1
+
+; ===== END : TestCase ADC =====
+dispstr 10
+dispstr '===== END : TestCase ADC ====='
+dispstr 10
+return
+
+:dotest
+sprintf2 filename '%s\%s\%s.log' mdir ipstr filestr
+sprintf2 delfilename '%s\%s.log' ipstr filestr
+filedelete delfilename
+sprintf2 logstr 'Test %s' filestr
+sprintf2 testfile '..\%s\%s.ttl' ipstr filestr
+logopen filename 0 0
+logwrite logstr
+include testfile
+pause delay
+logclose
+call decision
+return
+
+:decision
+timeout=600
+fileopen fhandle filename 0
+if NeedReview == 1 then
+    resultstr=Reviewstr
+else
+    filestrseek fhandle chkstr
+    if result=0 then
+        resultstr=Failstr
+    else 
+        resultstr=Passstr
+    endif
+endif
+
+fileseek fhandle 0 0
+do
+    filereadln fhandle line
+    filewriteln frethnd line
+loop while result == 0
+filewriteln frethnd resultstr
+filewriteln frethnd 0
+filewriteln frethnd 0
+fileclose fhandle
+NeedReview=0
+resultstr=''
+pause 1
+
+return

@@ -42,6 +42,7 @@
 #define SUBFAMILY_A31S13X 0x000E0000
 #define SUBFAMILY_A31G33X 0x000F0000
 #define SUBFAMILY_A31G34X 0x00100000
+#define SUBFAMILY_A31T41X 0x00200000
 
 /* Board list : Device information reserves 20bits and Board information reserves 12bit */
 /* Board information 12bits are composed of below */
@@ -69,6 +70,7 @@
 #define BD_STK_A31S134_RLN_A  (SUBFAMILY_A31S13X + 0x01)
 #define BD_STK_A31G336_RLN_A  (SUBFAMILY_A31G33X + 0x01)
 #define BD_STK_A31G346_RLN_A  (SUBFAMILY_A31G34X + 0x01)
+#define BD_STK_A31T413_RLN_A  (SUBFAMILY_A31T41X + 0x01)
 
 /* Target Board Serial Module */
 #define BD_SERIAL_MODULE_NONE     (0)
@@ -291,6 +293,15 @@
 #define A31SXXX 0
 #define A31GXXX_PRODUCT SUBFAMILY_A31G34X
 
+#elif defined (EXTRN_SUBFAMILY_A31T41x)
+#define A31GXXX 0
+#define A31MXXX 0
+#define A31TXXX 1
+#define A31LXXX 0
+#define A31CXXX 0
+#define A31SXXX 0
+#define A31TXXX_PRODUCT SUBFAMILY_A31T41X
+
 #else
 #error "Unknown sub family"
 #endif
@@ -465,6 +476,21 @@
 #include "../A31T21x/Config/startup_a31t21x.h"
 #include "../A31T21x/Config/debug_a31t21x.h"
 #include "../A31T21x/Config/board_a31t21x.h"
+#endif
+
+#elif (A31TXXX_PRODUCT == SUBFAMILY_A31T41X)
+#if defined(_RTE_)
+#include "a31t41x.h"
+#include "config_a31t41x.h"
+#include "startup_a31t41x.h"
+#include "debug_a31t41x.h"
+#include "board_a31t41x.h"
+#else
+#include "../A31T41x/Config/a31t41x.h"
+#include "../A31T41x/Config/config_a31t41x.h"
+#include "../A31T41x/Config/startup_a31t41x.h"
+#include "../A31T41x/Config/debug_a31t41x.h"
+#include "../A31T41x/Config/board_a31t41x.h"
 #endif
 
 #else
