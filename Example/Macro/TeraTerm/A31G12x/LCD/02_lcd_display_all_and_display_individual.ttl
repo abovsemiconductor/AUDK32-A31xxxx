@@ -1,0 +1,142 @@
+; A. Description
+;    A list of commands here configures LCD module and displays a number on LCD.
+;
+; B. Preparation
+;    Connecting ports with LCD should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. LCD
+;    2. PCU/GPIO
+;
+; D. Port Connection
+;    1. PE0 (LCD COM0)   <----> COM0 (Port1)
+;       PE1 (LCD COM1)   <----> COM1 (Port2)
+;       PE2 (LCD COM2)   <----> COM2 (Port3)
+;       PE3 (LCD COM3)   <----> COM3 (Port4)
+;       PD5 (LCD SEG7)   <----> SEG7 (Port5)
+;       PD4 (LCD SEG8)   <----> SEG8 (Port6)
+;       PD3 (LCD SEG9)   <----> SEG9 (Port7)
+;       PD2 (LCD SEG10)  <----> SEG10 (Port8)
+;       PD1 (LCD SEG11)  <----> SEG11 (Port9)
+;       PD0 (LCD SEG12)  <----> SEG12 (Port10)
+;       PC12 (LCD SEG13) <----> SEG13 (Port11)
+;       PC11 (LCD SEG14) <----> SEG14 (Port12)
+;       PC10 (LCD SEG15) <----> SEG15 (Port13)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; - LCD Board (Tested) : GDC8310 TN LCD
+;
+; LCD0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 m m 0 128 ]
+;    Source                     : m (MCCR : Misc Clock)
+;    MCCR Source                : m (MCLK : Main Clock)
+;    MCCR Source Divide         : 0 (MCLK / 2^6)
+;    LCD Pre-Divide             : 128
+;
+; 3. Config                     : [ 0 i 2 4 -auto 1 ]
+;    Bias                       : i (Internal)
+;    LCD Dividing Register      : 2 (66/66/50)
+;    Duty                       : 4 (1/4 duty, 1/3 bias)
+;    Timing by Auto Bias(-auto) : 1 (1 clock)
+;
+; 4. Data                       : [ 0 7 0x0F 8 0x0F 9 0x0F 10 0x0F 11 0x0F 12 0x0F 13 0x0F 14 0x0F 15 0x0F ]
+;    Seg Number                 : 7, 8, 9, 10, 11, 12, 13, 14, 15
+;    Com Bit                    : 0x0F (Com0, Com1, Com2, Com3)
+;
+; PCU (COM)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 0 a 0 ] [ 4 1 a 0 ] [ 4 2 a 0 ] [ 4 3 a 0 ]
+;    Pin Number                : 0 / 1 / 2 / 3
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (COM0) / 0 (COM1) / 0 (COM2) / 0 (COM3)
+;
+; PCU (SEG)
+; 1. Port Group                : 2 / 3 (PCU Port C / D)
+;
+; 2. Port                      : [ 2 10 a 0 ] [ 2 11 a 0 ] [ 2 12 a 0 ] [ 3 0 a 0 ] [ 3 1 a 0 ] [ 3 2 a 0 ] [ 3 3 a 0 ] [ 3 4 a 0 ] [ 3 5 a 0 ]
+;    Pin Number                : 10 / 12 / 11 / 0 / 1 / 2 / 3 / 4 / 5
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (SEG15) / 0 (SEG14) / 0 (SEG13) / 0 (SEG12) / 0 (SEG11) / 0 (SEG10) / 0 (SEG9) / 0 (SEG8) / 0 (SEG7)
+;
+; PCU
+sendln 'cm pcu'
+mpause 30
+; COM
+sendln 'port 4 0 a 0'
+mpause 30
+sendln 'port 4 1 a 0'
+mpause 30
+sendln 'port 4 2 a 0'
+mpause 30
+sendln 'port 4 3 a 0'
+mpause 30
+
+; SEG
+sendln 'port 2 10 a 0'
+mpause 30
+sendln 'port 2 11 a 0'
+mpause 30
+sendln 'port 2 12 a 0'
+mpause 30
+sendln 'port 3 0 a 0'
+mpause 30
+sendln 'port 3 1 a 0'
+mpause 30
+sendln 'port 3 2 a 0'
+mpause 30
+sendln 'port 3 3 a 0'
+mpause 30
+sendln 'port 3 4 a 0'
+mpause 30
+sendln 'port 3 5 a 0'
+mpause 30
+
+; LCD0
+sendln 'cm lcd'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m m 0 128'
+mpause 30
+sendln 'config 0 i 2 4 -auto 1'
+mpause 30
+sendln 'data 0 7 0x0F 8 0x0F 9 0x0F 10 0x0F 11 0x0F 12 0x0F 13 0x0F 14 0x0F 15 0x0F'
+mpause 30
+sendln 'disp 0 on'
+pause 1
+sendln 'data 0 7 0x00 8 0x00 9 0x00 10 0x00 11 0x00 12 0x00 13 0x00 14 0x00'
+pause 1
+
+i = 10
+do while i>0
+    i = i - 1
+    if i = 9 then
+        sendln 'data 0 7 0x01 9 0x01 11 0x01 13 0x01'
+    elseif i = 8 then
+        sendln 'data 0 7 0x02 9 0x02 11 0x02 13 0x02'
+    elseif i = 7 then
+        sendln 'data 0 7 0x04 9 0x04 11 0x04 13 0x04'
+    elseif i = 6 then
+        sendln 'data 0 7 0x08 9 0x08 11 0x08 13 0x08'
+    elseif i = 5 then
+        sendln 'data 0 7 0x00 8 0x01 9 0x00 10 0x01 11 0x00 12 0x01 13 0x00 14 0x01'
+    elseif i = 4 then
+        sendln 'data 0 8 0x02 10 0x02 12 0x02 14 0x02'
+    elseif i = 3 then
+        sendln 'data 0 8 0x04 10 0x04 12 0x04 14 0x04'
+    elseif i = 2 then
+        sendln 'data 0 8 0x08 10 0x08 12 0x08 14 0x08'
+    elseif i = 1 then
+        sendln 'data 0 7 0x00 8 0x00 9 0x00 10 0x00 11 0x00 12 0x00 13 0x00 14 0x00'
+    else
+        sendln 'data 0 7 0x0F 8 0x0F 9 0x0F 10 0x0F 11 0x0F 12 0x0F 13 0x0F 14 0x0F'
+    endif
+    pause 1
+loop
+

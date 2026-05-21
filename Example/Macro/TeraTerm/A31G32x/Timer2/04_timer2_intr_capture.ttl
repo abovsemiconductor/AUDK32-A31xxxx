@@ -1,0 +1,113 @@
+; A. Description
+;    A list of commands here configures timer1 and generates a capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer2
+;    2. Timer3
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer21 : PF2 (Capture Input)
+;    2. Timer30 : PA9 (Output)
+;
+; E. Port Connection
+;    1. PA9 (Timer30 Output) ----> PF2 (Timer21 Capture Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer21
+; 1. Channel                   : 1 (Timer21)
+;
+; 2. Clock                     : [ 1 p 4000 ]
+;    Source                    : p (PCLK : Peripheral Clock)
+;    Timer2 Pre-Divide         : 4000 (PCLK / 4000)
+;
+; 3. Config                    : [ 0 i c b e c h 9600 9600 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : c (Capture)
+;    Capture Egde              : b (Both)
+;    Capture Source            : e (Capture Port Input)
+;    Counter Mode              : c (Clear Count)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 9600
+;    B Data                    : 9600
+;
+; Timer30
+; 1. Channel                   : 0 (Timer30)
+;
+; 2. Clock                     : [ 0 m h 10 1000]
+;    Source                    : m ( MCCR : Misc Clock )
+;    MCCR Source               : h ( HSI : High Speed Internal Clock - 48MHz )
+;    Source Divide             : 10 
+;    Timer3 Pre-Divide         : 1000 ( MCCR Clock / 10 ) / 1000
+;
+; 3. Config                    : [ 0 i i s 19200 4800 9600 14400 ]
+;    Operation                 : Interrupt
+;    Mode                      : Period
+;    Output Port Polarity      : High Level
+;    Period                    : 19200
+;    A Data                    : 4800
+;    B Data                    : 9600
+;    C Data                    : 14400
+;
+; PCU (PA9)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 9 a 3 ]
+;    Pin Number                : 9
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 (T30OUT)
+;
+; PCU (PF2)
+; 1. Port Group                : 5 (PCU Port F)
+;
+; 2. Port                      : [ 5 2 a 5 ]
+;    Pin Number                : 2
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 5 (T21CAP)
+
+; PCU (PA9)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 9 a 3'
+mpause 30
+
+; PCU (PF2)
+sendln 'port 5 2 a 5'
+mpause 30
+
+; Timer30
+sendln 'cm timer3'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i i s 19200 4800 9600 14400'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; Timer21
+sendln 'cm timer2'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 m h 10 1000'
+mpause 30
+sendln 'clk 1 p 4000'
+mpause 30
+sendln 'config 1 i c b e d h 9600 9600'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 1'

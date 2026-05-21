@@ -1,0 +1,67 @@
+; A. Description
+;    A list of commands here configures USART as USRT and receives data.
+;
+; B. Preparation
+;    Connecting ports with a suitable instrument should be correct
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. USART
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. USART1  : PC9 (Serial Clock)
+;               : PC7 (Transmit)
+;               : PC8 (Receive)
+;
+; E. Port Connection
+;    1. PC7 (Transmit  / StarterKit 1) <----> PC8 (Receive / StarterKit 2)
+;    2. PC8 (Receive / StarterKit 1)  <----> PC7 (Transmit / StarterKit 2)
+;    3. PC9 (Serial Clock / StarterKit 1) <----> PC9 (Serial Clock / StarterKit 2)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; USART1
+; 1. Channel                   : 1 (USART1)
+;
+; 2. Config                    : [ 1 i a s 8 n 1 0 38400 ]
+;    Operation                 : i (Interrupt)
+;    USART Mode                : a (USRT)
+;    USRT Mode                 : s (Slave)
+;    Data Bit                  : 8 (8bit)
+;    Parity                    : n (None)
+;    Stop Bit                  : 1 (1bit)
+;    Polarity                  : 0 (Tx Rising and Rx Falling Edge)
+;    Baudrate                  : 38400 bps
+;
+; 3. Rx                        : [ 1 8 ]
+;    Receive Data Length       : 8
+;
+; PCU (PCx)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 9 a 3 -pupd p ] [ 2 8 a 4 -pupd p ] [ 2 7 a 4 -pupd p ]
+;    Pin Number                : 9 / 8 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 / 4 / 4 (SCK/RXD11/TXD11)
+;    Pull-up/down              : p (Pull-up)
+;
+; PCU (PCx)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 2 9 a 3 -pupd p'
+mpause 30
+sendln 'port 2 8 a 4 -pupd p'
+mpause 30
+sendln 'port 2 7 a 4 -pupd p'
+mpause 30
+
+; USART1
+sendln 'cm usart'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'config 1 i a s 8 n 1 0 38400'
+mpause 30
+sendln 'rx 1 8'

@@ -1,0 +1,78 @@
+; A. Description
+;    A list of commands here configures PCU module and generates input interrupt via the signal from timer1.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;    2. Timer1
+;
+; C. Default Port
+;    1. PCU     : PA2 (Input)
+;    2. Timer10 : PE6/PE6 (Output/Capture Input)
+;               : PC11 (External Clock Input)
+;
+; D. Port Connection
+;    1. PE6 (Timer10 Output) ----> PA2 (Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; PCU (PA2)
+; 1. Port Group                   : 0 (PCU Port A)
+;
+; 2. Port                         : [ 0 2 i i -intr i e r -pupd n ]
+;    Pin Number                   : 2
+;    Pin Mode                     : i (Input)
+;    Pin Input Mode               : i (Normal Input)
+;    Pin Operation Mode           : i (Interrupt)
+;    Pin Interrupt Mode           : e (Edge)
+;    Pin Interrupt Trigger Edge   : r (Rising)
+;    Pull-up/down                 : n (Pull-down)
+;
+; Timer10
+; 1. Channel                      : 0 (Timer10)
+;
+; 2. Clock                        : [ 0 m h 10 1000]
+;    Source                       : m (MCCR : Misc Clock)
+;    MCCR Source                  : h (HSI : High Speed Internal Clock - 48MHz)
+;    Source Divide                : 10 
+;    Timer1 Pre-Divide            : 1000 (MCCR Clock / 10) / 1000
+;
+; 3. Config                       : [ 0 i p h 4800 4800 ]
+;    Operation                    : i (Interrupt)
+;    Mode                         : p (Period)
+;    Output Port Polarity         : h (High)
+;    A Data                       : 4800
+;    B Data                       : 4800
+;
+; PCU (PE6)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 6 a 1 ]
+;    Pin Number                : 6 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (T10O)
+;
+; PCU (PA2)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 2 i i -intr i e r -pupd n'
+mpause 30
+
+; PCU (PE6)
+sendln 'port 4 6 a 1'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i p h 4800 4800'
+mpause 30
+sendln 'start 0'

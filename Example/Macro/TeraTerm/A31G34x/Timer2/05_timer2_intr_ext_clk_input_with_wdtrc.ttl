@@ -1,0 +1,88 @@
+; A. Description
+;    A list of commands here configures timer2 and generates a periodic interrupt based on external clock source.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer2
+;    2. SCUCLK
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer20 : PC1/PC1 (Output/Capture Input)
+;               : PC1 (External Clock Input)
+;    2. PCU     : PA1 (Clock Output)
+;
+; E. Port Connection
+;    1. PA1 (Clock Output) ----> PC1 (Timer20 External Clock Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer20
+; 1. Channel                   : 0 (Timer20)
+;
+; 2. Clock                     : [ 0 e f 0 ]
+;    Source                    : e (External Clock Input) 
+;    External Clock Input Edge : f (Falling) 
+;    Timer2 Pre-Divide         : 0 (No Pre-Divider available so default 0)
+;
+; 3. Config                    : [ 0 i p h 40000 40000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Periodic)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 40000
+;    B Data                    : 40000
+;
+; PCU (PA1)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 1 a 2 ]
+;    Pin Number                : 1
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 (CLKO)
+;
+; PCU (PC1)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 1 a 4 ]
+;    Pin Number                : 1
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (EC20)
+;
+; SCUCLK
+; 1. Clock Out                 : [ clkout w 0 e ]  
+;    Clock Source              : w (MCLK - WDTRC 40KHz)
+;    Clock Source Divide       : 0 (Clock Source 2^N)
+;    Clock Output Enable       : e (Enable)
+;
+; PCU (PA1)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 1 a 2'
+mpause 30
+
+; PCU (PC1)
+sendln 'port 2 1 a 4'
+mpause 30
+
+; SCUCLK
+sendln 'cm scuclk'
+mpause 30
+sendln 'clkout w 0 e'
+mpause 30
+
+; Timer20
+sendln 'cm timer2'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 e f 0'
+mpause 30
+sendln 'config 0 i p h 40000 40000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

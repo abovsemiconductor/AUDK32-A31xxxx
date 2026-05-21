@@ -1,0 +1,109 @@
+; A. Description
+;    A list of commands here configures timer1 and generates a capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer1
+;    2. Timer4
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer12 : PA7 (Capture Input)
+;    2. Timer40 : PC7 (Output)
+;
+; E. Port Connection
+;    1. PC7 (Timer40 Output) ----> PA7 (Timer12 Capture Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer12
+; 1. Channel                   : 2 (Timer12)
+;
+; 2. Clock                     : [ 2 m h 10 1000 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 48MHz)
+;    Source Divide             : 10 
+;    Timer1 Pre-Divide         : 1000 (MCCR Clock / 10) / 1000
+;
+; 3. Config                    : [ 2 i c b h 9600 9600 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : c (Capture)
+;    Capture Egde              : b (Both)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 9600
+;    B Data                    : 9600
+;
+; Timer40
+; 1. Channel                   : 0 (Timer40)
+;
+; 2. Clock                     : [ 0 m h 10 1000 ]
+;    Source                    : m ( MCCR : Misc Clock )
+;    MCCR Source               : h ( HSI : High Speed Internal Clock - 48MHz )
+;    Source Divide             : 10 
+;    Timer4 Pre-Divide         : 1000 ( MCCR Clock / 10 ) / 1000
+;
+; 3. Config                    : [ 0 i p h 4800 4800 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 4800
+;    B Data                    : 4800
+;
+; PCU (PC7)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 7 a 8 ]
+;    Pin Number                : 7 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 8 (T40OUT)
+;
+; PCU (PA7)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 7 a 5 ]
+;    Pin Number                : 7 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 5 (T12CAP)
+
+; PCU (PC7)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 2 7 a 8'
+mpause 30
+
+; PCU (PA7)
+sendln 'port 0 7 a 5'
+mpause 30
+
+; Timer40
+sendln 'cm timer4'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i p h 4800 4800'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; Timer12
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 2'
+mpause 30
+sendln 'init 2'
+mpause 30
+sendln 'clk 2 m h 10 1000'
+mpause 30
+sendln 'config 2 i c b h 9600 9600'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 2'

@@ -1,0 +1,70 @@
+; A. Description
+;    A list of commands here configures USART as SPI and transmits data.
+;
+; B. Preparation
+;    Connecting ports with a suitable instrument should be correct
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. USART
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. USART1  : PA3 (Slave Select)
+;               : PA4 (Serial Clock)
+;               : PA5 (Master Out Slave In)
+;               : PA6 (Master In Slave Out)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; USART1
+; 1. Channel                   : 1 (USART1)
+;
+; 2. Config                    : [ 1 i s m m l e 7 ]
+;    Operation                 : i (Interrupt)
+;    USART Mode                : s (SPI)
+;    SPI Mode                  : s (Slave)
+;    Bit Order                 : m (MSB)
+;    Polarity                  : l (Low)
+;    Phase                     : e (Even Edge)
+;    Swap MOSI/MISO port       : Swap
+;    Baudrate                  : 7
+;
+; 3. Data                      : [ 1 8 0xa5 0x5a 0xa5 0x5a 0x05 0x07 0x09 0xa0 ]
+;    Data Length               : 8
+;    Data                      : 0xa5 ... (Hexa and space (delimitor))
+;
+; 4. Tx                        : [ 1 8 ]
+;    Receive Data Length       : 8
+;
+; PCU (PAx)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 3 a 3 ] [ 0 4 a 3 ] [ 0 5 a 3 ] [ 0 6 a 3 ]
+;    Pin Number                : 3 / 4 / 5 / 6
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 (SS/SCK/MOSI/MISO)
+;
+; PCU (PAx)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 3 o p h'
+mpause 30
+sendln 'port 0 4 a 3'
+mpause 30
+sendln 'port 0 5 a 3'
+mpause 30
+sendln 'port 0 6 a 3'
+mpause 30
+
+; USART1
+sendln 'cm usart'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'config 1 i s m m l e 7'
+mpause 30
+sendln 'data 1 8 0xa5 0x5a 0xa5 0x5a 0x05 0x07 0x09 0xa0'
+mpause 30
+sendln 'tx 1 8'

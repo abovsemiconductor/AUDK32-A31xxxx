@@ -1,0 +1,124 @@
+; A. Description
+;    A list of commands here configures SPI module and receives data via SPI.
+;
+; B. Preparation
+;    Connecting ports with an external SPI device should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. SPI
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. SPI0    : PE6 (Slave Select)
+;               : PE7 (Serial Clock)
+;               : PE9 (Master Out Slave In)
+;               : PE8 (Master In Slave Out)
+;    2. SPI1    : PD2 (Slave Select)
+;               : PD3 (Serial Clock)
+;               : PD7 (Master Out Slave In)
+;               : PD4 (Master In Slave Out)
+;
+; E. Port Connection
+;    1. PE6 (Slave Select)        <----> PD2 (Slave Select)
+;    2. PE7 (Serial Clock)        <----> PD3 (Serial Clock)
+;    3. PE9 (Master Out Slave In) <----> PD7 (Master Out Slave In)
+;    4. PE8 (Master In Slave Out) <----> PD4 (Master In Slave Out)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; SPI0
+; 1. Channel                   : 0 (SPI0)
+;
+; 2. Config                    : [ 0 i s 8 0 m h 101 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : s (Slave)
+;    Data Length               : 8 (8bit)
+;    Polarity/Phase            : 0 (Polarity : Low, Phase : Low)
+;    Bit Order                 : m (MSB)
+;    Slave Select Pin Polarity : h (High)
+;    Baudrate                  : 101 (PCLK / 2 / (Baudrate + 1))
+;
+; 3. Rx                        : [ 0 8 ]
+;    Receive Data Length       : 8
+;
+; SPI1
+; 1. Channel                   : 1 (SPI1)
+;
+; 2. Config                    : [ 1 i m 8 0 m h 101 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : m (Master)
+;    Data Length               : 8 (8bit)
+;    Polarity/Phase            : 0 (Polarity : Low, Phase : Low)
+;    Bit Order                 : m (MSB)
+;    Slave Select Pin Polarity : h (High)
+;    Baudrate                  : 101 (PCLK / 2 / (Baudrate + 1))
+;
+; 3. Data                      : [ 1 8 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x09 ]
+;    Data Length               : 8
+;    Data                      : 0x01 ... (Hexa and space (delimitor))
+;
+; 4. Tx                        : [ 1 8 ]
+;    Transmit Data Length      : 8
+;
+; PCU (PEx)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 6 a 3 ] [ 4 7 a 3 ] [ 4 8 a 3 ] [ 4 9 a 3 ]
+;    Pin Number                : 6 / 7 / 8 / 9
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 (SS0/SCK0/MISO0/MOSI0)
+; 
+; PCU (PDx)
+; 1. Port Group                : 3 (PCU Port D)
+;
+; 2. Port                      : [ 3 2 a 6 ] [ 3 3 a 3 ] [ 3 4 a 3 ] [ 3 7 a 3 ]
+;    Pin Number                : 2 / 3 / 4 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 (SS1/SCK1/MISO1/MOSI1)
+; 
+; PCU (PEx)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 4 6 a 3 -pupd p'
+mpause 30
+sendln 'port 4 7 a 3 -pupd p'
+mpause 30
+sendln 'port 4 8 a 3 -pupd p'
+mpause 30
+sendln 'port 4 9 a 3 -pupd p'
+mpause 30
+
+; PCU (PDx)
+sendln 'port 3 2 o p h -pupd p'
+mpause 30
+sendln 'port 3 3 a 3 -pupd p'
+mpause 30
+sendln 'port 3 4 a 3 -pupd p'
+mpause 30
+sendln 'port 3 7 a 3 -pupd p'
+mpause 30
+
+; SPI0
+sendln 'cm spi'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 i s 8 0 m h 101'
+mpause 30
+sendln 'rx 0 8'
+mpause 100
+
+; SPI1
+sendln 'cm spi'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'config 1 i m 8 0 m h 101'
+mpause 30
+sendln 'data 1 8 0xa5 0x5a 0xa5 0x5a 0xff 0x10 0x01 0x55'
+mpause 100
+sendln 'tx 1 8'

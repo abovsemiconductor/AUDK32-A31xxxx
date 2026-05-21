@@ -1,0 +1,112 @@
+; A. Description
+;    A list of commands here configures timer3 and generates a high-z and a interval interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer3
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer30 : PE0 (PWM AA Output)
+;               : PE1 (PWM AB Output)
+;               : PE2 (PWM BA Output)
+;               : PE3 (PWM BB Output)
+;               : PE4 (PWM CA Output)
+;               : PE5 (PWM CB Output)
+;               : PF7 (Capture Input)
+;               : PF6 (External Clock Input)
+;               : PF5 (BLANK Input)
+;    2. Timer12 : PA5/PA5 (Output/Capture Input)
+;               : PA2 (External Clock Input)
+;
+; E. Port Connection
+;    1. PA5 (Timer12 Output) ----> PF5 (Timer30 BLANK Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer30
+; 1. Channel                   : 0 (Timer30)
+;
+; 2. Clock                     : [ 0 p 3999 ]
+;    Source                    : p (PCLK)
+;    Timer1 Pre-Divide         : 3999 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 0 i i s -hiz r e m 40000 10000 20000 30000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Capture Edge              : b (Both Edge)
+;    Output Mode               : s (6-ch)
+;    High-Z Edge               : r (Rising)
+;    High-Z Source             : e (External Blank)
+;    High-Z Interrupt Mode     : m (Maskable)
+;    Period                    : 40000
+;    A Data                    : 10000
+;    B Data                    : 20000
+;    C Data                    : 30000
+;
+; Timer12 
+; 1. Channel                   : 2 (Timer12)
+;
+; 2. Clock                     : [ 2 p 0 3999 ]
+;    Source                    : p (PCLK)
+;    PCLK Divider              : 0 (No Divider available so default 0)
+;    Timer1 Pre-Divide         : 3999 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 2 i p h 10000 10000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 10000
+;    B Data                    : 10000
+;
+; PCU
+; 1. Port Group                : 0 (PCU Port A) / 5 (PCU Port F)
+;
+; 2. Port                      : [ 0 5 a 1 ] [ 5 5 a 1 ]
+;    Pin Number                : 5 / 5
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (T12OUT) / 1 (BLNK)
+;
+; PCU(PA5)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 5 a 1'
+mpause 30
+
+; PCU(PF5)
+sendln 'port 5 5 a 1'
+mpause 30
+
+; Timer12
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 2'
+mpause 30
+sendln 'init 2'
+mpause 30
+sendln 'clk 2 p 0 3999'
+mpause 30
+sendln 'config 2 i p h 10000 10000'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 2'
+mpause 30
+
+; Timer30 
+sendln 'cm timer3'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 3999'
+mpause 30
+sendln 'config 0 i i s -hiz r e m 40000 10000 20000 30000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

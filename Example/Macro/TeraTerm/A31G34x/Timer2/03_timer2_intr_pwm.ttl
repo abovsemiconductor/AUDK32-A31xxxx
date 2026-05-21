@@ -1,0 +1,43 @@
+; A. Description
+;    A list of commands here configures timer2 and generates a PWM interrupt.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer2
+;
+; C. Default Port
+;    1. Timer20 : PC0/PC0 (Output/Capture Input)
+;               : PC2 (External Clock Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer20
+; 1. Channel                   : 0 (Timer20)
+;
+; 2. Clock                     : [ 0 p 3999 ]
+;    Source                    : p (PCLK)
+;    Timer1 Pre-Divide         : 3999 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 0 i o h 10000 20000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : m (PWM) 
+;    Output Port Polarity      : h (High)
+;    A Data                    : 10000
+;    B Data                    : 20000
+;
+; Timer20
+sendln 'cm timer2'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 3999'
+mpause 30
+sendln 'config 0 i m h 10000 20000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

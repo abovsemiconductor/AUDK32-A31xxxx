@@ -1,0 +1,63 @@
+; A. Description
+;    A list of commands here configures SPI module and receives data via SPI.
+;
+; B. Preparation
+;    Connecting ports with an external SPI device should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. SPI
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. SPI0    : PE4 (Slave Select)
+;                 : PE3 (Serial Clock)
+;                 : PE1 (Master Out Slave In)
+;                 : PE2 (Master In Slave Out)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; SPI0
+; 1. Channel                   : 0 (SPI0)
+;
+; 2. Config                    : [ 0 i s 8 0 m h 101 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : s (Slave)
+;    Data Length               : 8 (8bit)
+;    Polarity/Phase            : 0 (Polarity : Low, Phase : Low)
+;    Bit Order                 : m (MSB)
+;    Slave Select Pin Polarity : h (High)
+;    Baudrate                  : 101 (PCLK / 2 / (Baudrate + 1))
+;
+; 3. Rx                        : [ 0 8 ]
+;    Receive Data Length       : 8
+;
+; PCU (PEx)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 4 a 5 ] [ 4 3 a 3 ] [ 4 2 a 3 ] [ 4 1 a 3 ]
+;    Pin Number                : 4 / 3 / 2 / 1
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 5/3 (SS0/SCK0/MISO0/MOSI0)
+; 
+; PCU (PEx)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 4 4 a 5 -pupd p'
+mpause 30
+sendln 'port 4 3 a 3 -pupd p'
+mpause 30
+sendln 'port 4 2 a 3 -pupd p'
+mpause 30
+sendln 'port 4 1 a 3 -pupd p'
+mpause 30
+
+; SPI0
+sendln 'cm spi'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 i s 8 0 m h 101'
+mpause 30
+sendln 'rx 0 8'

@@ -1,0 +1,42 @@
+; A. Description
+;    A list of commands here configures SCU PWR and reads/writes backup data.
+;
+; B. Preparation
+;    Measure PC13 port whether proper frequency is available or not.
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. SCUPWR
+;    2. RTC
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. RTC0   : PC13 (RTC Clock Output)
+;
+; E. Note
+;    RTC module should be enabled.
+;
+; SCUPWR
+; 1. BAKDR                       : [ 0 1 2 3 ]
+;    Backup Data Index           : 0 / 1 / 2 / 3
+;
+; PCU (PC13)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 1 13 a 7 ]
+;    Pin Number                : 13
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 7 (RTC_TAMP1)
+;
+; PCU (PC13)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 13 a 7'
+mpause 30
+
+; SCUPWR
+sendln 'cm scupwr'
+mpause 30
+sendln 'bakdr 0 1 2 3'
+

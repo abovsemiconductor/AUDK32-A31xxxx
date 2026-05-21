@@ -1,0 +1,177 @@
+; A. Description
+;    A list of commands here configures ADC and generates single capture interrupt by DAC output signal.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+; 
+; C. Prerequisite Example (abov_example_config.h)
+;    1. ADC
+;    2. Timer1
+;    3. DAC
+;    4. PCU/GPIO
+;
+; D. Default Port
+;    1. ADC0    : PA10 (AN13)
+;    2. DAC0    : PA6 (DAO)
+;
+; E. Port Connection
+;    1. PA6 (DAC0 DAO) ---> PA10 (AN13)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; ADC0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 p 63 ]
+;    Source                     : p (Periperhal Clock)
+;    Peripheral Clock Divide    : 63 (Divide + 1)
+;
+; 3. Config                     : [ config 0 i i ]
+;    Operation                  : i (Interrupt)
+;    Reference Level            : i (Internal VDD)
+;
+; 4. Seq                        : [ 0 1 0 13 ]
+;    Sequence Number            : 0
+;    Trigger Source             : 1 (Timer1)
+;    Trigger Source Number      : 0 (Timer10)
+;    Input Channel              : 13 
+;
+; Timer10
+; 1. Channel                    : 0 (Timer10)
+;
+; 2. Clock                      : [ 0 m h 10 1000 ]
+;    Source                     : m (MCCR : Misc Clock)
+;    MCCR Source                : h (HSI : High Speed Internal Clock - 48MHz)
+;    Source Divide              : 10
+;    Timer1 Pre-Divide          : 1000 (MCCR Clock / 10) / 1000
+;
+; 3. Config                     : [ 0 i p h 48 48 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : p (Period)
+;    Output Port Polarity       : h (High)
+;    A Data                     : 1200
+;    B Data                     : 1200
+;
+; Timer11
+; 1. Channel                    : 1 (Timer11)
+;
+; 2. Clock                      : [ 1 m h 10 10 ]
+;    Source                     : m (MCCR : Misc Clock)
+;    MCCR Source                : h (HSI : High Speed Internal Clock - 48MHz)
+;    Source Divide              : 10
+;    Timer1 Pre-Divide          : 10 (MCCR Clock / 10) / 10
+;
+; 3. Config                     : [ 1 i p h 120 120 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : p (Period)
+;    Output Port Polarity       : h (High)
+;    A Data                     : 120
+;    B Data                     : 120
+;
+; DAC0
+; 1. Config                     : [ 0 i a i i 1 -pg p 0 ]
+;    Operation                  : i (Interrupt for Auto Mode)
+;    Mode                       : a (Auto)
+;    Direction for Auto Mode    : i (Increment)
+;    Reference Level            : i (Internal VDD)
+;    Re-load reference          : 1 (Timer11)
+;    Programmable Gain          : p (Positive)
+;    Programmable Gain Level    : 0 (0dB)
+;
+; PCU (PA6)
+; 1. Port Group                 : 0 (PCU Port A)
+;
+; 2. Port                       : [ 0 6 a 3 ]
+;    Pin Number                 : 6
+;    Pin Mode                   : a (Alternative)
+;    Alternative                : 3 (DAO)
+; 
+; PCU (PA10)
+; 1. Port Group                 : 0 (PCU Port A)
+;
+; 2. Port                       : [ 0 10 a 3 ]
+;    Pin Number                 : 10
+;    Pin Mode                   : a (Alternative)
+;    Alternative                : 3 (AN13)
+;
+; PCU (PA6)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 6 a 3'
+mpause 30
+
+; PCU (PA10)
+sendln 'port 0 10 a 3'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i p h 1200 1200'
+mpause 30
+
+; Timer11
+sendln 'cm timer1'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 m h 10 10'
+mpause 30
+sendln 'config 1 i p h 120 120'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 63'
+mpause 30
+sendln 'config 0 i i'
+mpause 30
+sendln 'seq 0 1 0 13'
+mpause 30
+sendln 'log on'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; Timer11
+sendln 'start 1'
+mpause 30
+
+; DAC0
+sendln 'cm dac'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 i a i i 1 -pg p 0'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'start 0'
+mpause 30

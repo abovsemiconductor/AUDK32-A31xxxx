@@ -1,0 +1,28 @@
+; A. Description
+;    A list of commands here configures Temperature Sensor module and generates Sensor Clock count/Temperature value
+;    through interrupt by Temperature Sensor.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. TEMP SENSOR
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; 1. Channel                      : 0 (TempSens 0)
+;
+; 2. Config                       : [ 0 i e t ]
+;    Operation                    : Interrupt
+;    Reference Clock Source       : e (HSE : High Speed External Clock)
+;    Sensor Clock Source          : t (LSITS : Low Speed Internal Temp Sensor Clock)
+;
+sendln 'cm tempsens'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 i m t'
+mpause 30
+sendln 'start 0'

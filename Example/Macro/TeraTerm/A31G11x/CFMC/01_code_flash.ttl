@@ -1,0 +1,123 @@
+; A. Description
+;    A list of commands here configures CFMC and erase and write code flash
+;
+; B. Preparation
+;    Setup ARM debugger to connect device without reset to see registers and flash memory
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Flash
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; 1. Code Flash Size : 0x4000(On REQ)/0x8000(MP)
+;    0x10000 is taken as flash size to test
+; 2. Code Write Protection Size  : 0x800
+; 3. Erase Mode
+;    - CFMC_CHIP_ERASE_MODE = 0
+;    - CFMC_PAGE_ERASE_MODE = 1
+;    - CFMC_1KB_ERASE_MODE  = 2
+;    - CFMC_2KB_ERASE_MODE  = 4
+;    - CFMC_4KB_ERASE_MODE  = 8
+;    CFMC_PAGE_ERASE_MODE is taken to test code flash.
+
+;;;;;;;;;;;;;;;;;;;;;;    Define Variables ;;;;;;;;;;;;;;;;;;;;;
+CFMC_CHIP_ERASE_MODE = 0
+CFMC_PAGE_ERASE_MODE = 1
+CFMC_1KB_ERASE_MODE  = 2
+CFMC_2KB_ERASE_MODE  = 4
+CFMC_4KB_ERASE_MODE  = 8
+
+FLASH_SIZE = 32768
+
+SIZE_2KB  = 2048
+SIZE_1KB  = 1024
+SIZE_128B = 128
+
+START_TEST_ADDR = FLASH_SIZE - SIZE_2KB
+
+DUMP_ADDR = START_TEST_ADDR
+DUMP_LEN = SIZE_1KB
+DISP_MESSAGE = ""
+
+;;;;;;;;;;;;;;;;;;;;;;  Test commands here ;;;;;;;;;;;;;;;;;;;;;
+sendln 'cm cfmc'
+mpause 20
+
+; Print flash geometric information
+sprintf2 DISP_MESSAGE "01.Print flash geometric information"
+call display_message
+sendln 'info'
+pause 3
+
+; Unprotect all code flash area
+sprintf2 DISP_MESSAGE "02.Unprotect all code flash area"
+call display_message
+sendln 'wprot 0xFFFFFFFF 0 0'
+pause 3
+
+; Erase 2KB at FLASH_SIZE
+sprintf2 DISP_MESSAGE "03.Erase 2KB at 0x%08X" START_TEST_ADDR
+call display_message
+i = 0
+do while i < 16
+    sprintf2 cmd "erase 0x%x %d" START_TEST_ADDR+(SIZE_128B*i) CFMC_PAGE_ERASE_MODE
+    sendln cmd
+    mpause 300
+    i = i + 1;
+loop
+pause 3
+
+sprintf2 DISP_MESSAGE "04.Dump memory (0x%08X ~ 0x%08X)" START_TEST_ADDR (START_TEST_ADDR+SIZE_2KB-1)
+call display_message
+pause 3
+DUMP_ADDR=START_TEST_ADDR
+DUMP_LEN=SIZE_2KB/4
+call dump_memory
+
+; Write predefined 32B data (0x00 ~ 0x1F) at START_TEST_ADDR into flash write protected area
+; See the result of 'info' command
+sprintf2 DISP_MESSAGE "05.Write 32Byte data (0x00 ~ 0x1F) to flash write protected area (0x%08X ~ 0x%08X)" START_TEST_ADDR (START_TEST_ADDR+SIZE_2KB-1)
+call display_message
+sprintf2 cmd "write 0x%x 0xFFFFFFFF" START_TEST_ADDR
+sendln cmd
+pause 3
+
+; Read 2KB
+sprintf2 DISP_MESSAGE "06.Dump memory (0x%08X ~ 0x%08X)" START_TEST_ADDR (START_TEST_ADDR+SIZE_2KB-1)
+call display_message
+pause 3
+DUMP_ADDR=START_TEST_ADDR
+DUMP_LEN=SIZE_2KB/4
+call dump_memory
+
+sprintf2 DISP_MESSAGE "End of Flash Test Sequence."
+call display_message
+
+goto finish
+
+return
+
+; Dump specific flash memory
+:dump_memory
+    timeout = 200
+    mpause 30
+    sendln 'cm scu'
+    mpause 100
+    sprintf2 cmd "rmem 0x%x %d" DUMP_ADDR DUMP_LEN 
+    sprintf2 waitstr "0x%08X" (DUMP_ADDR+((DUMP_LEN)*4-4))
+    sendln cmd
+    wait waitstr 
+    mpause 30
+    sendln 'cm cfmc'
+    mpause 30
+    return
+
+; Dispaly message
+:display_message
+    sprintf2 dstr '        %s' DISP_MESSAGE
+    dispstr 10 10 dstr
+    send 10
+    mpause 100
+return
+
+:finish

@@ -1,0 +1,44 @@
+; A. Description
+;    A list of commands here configures timer1 and generates a period interrupt.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer1
+;
+; D. Default Port
+;    1. Timer10 : PE9/PE9 (Output/Capture Input)
+;               : PE8 (External Clock Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer10
+; 1. Channel                   : 0 (Timer10)
+;
+; 2. Clock                     : [ 0 p 0 3199 ]
+;    Source                    : p (PCLK)
+;    Source Divide             : 0 (Not available)
+;    Timer1 Pre-Divide         : 3199 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 0 i p h 10000 10000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 10000
+;    B Data                    : 10000
+;
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 0 3199'
+mpause 30
+sendln 'config 0 i p h 10000 10000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

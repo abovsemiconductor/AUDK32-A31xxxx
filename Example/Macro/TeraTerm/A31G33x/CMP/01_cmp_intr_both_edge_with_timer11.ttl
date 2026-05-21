@@ -1,0 +1,106 @@
+; A. Description
+;    A list of commands here configures CMP and generates both edge detected interrupt.
+;
+; B. Preparation
+;    Supply reference and source signal to specific port by a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. CMP
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. CMP0    : PA1 (CP0P0)
+;    2. Timer11 : PB6 (Output/Capture)
+;
+; E. Port Connection
+;    1. PB6 (Timer11 Output) ----> PA1 (CP0P0)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; CMP0
+; 1. Config                     : [ 0 i m 0 6 h b -dbc 6 0 d -ext m d e]
+;    Operation                  : i (Interrupt)
+;    Interrupt Mode             : m (Maskable)
+;    Source                     : 0 (CP0P0)
+;    Reference                  : 6 (INTREF 0.3V)
+;    Hysteresis                 : h (High)
+;    Trigger Mode               : b (both edge)
+;    Debounce/Noise Filter (-dbc)     
+;    Clock Divide               : 6
+;    Debounce Count             : 0 (No Count avaiable so default 0)
+;    LSI Clock Enable           : d (No LSI Clock available so default d)
+;    Extend Option (-ext)     
+;    Power Mode                 : m (No power mode available so default 0)
+;    Window Enable              : d (No window available so default 0)
+;    Internal Reference Enable  : e (Enable);
+;
+; Timer11
+; 1. Channel                   : 1 (Timer11)
+;
+; 2. Clock                     : [ 1 p 0 3199 ]
+;    Source                    : p (PCLK)
+;    Source Divide             : 0 (Not available)
+;    Timer1 Pre-Divide         : 3199 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 1 i p h 10000 10000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 10000
+;    B Data                    : 10000
+;
+; PCU (PB6)
+; 1. Port Group                : 1 (PCU Port B)
+;
+; 2. Port                      : [ 1 0 a 0 ]
+;    Pin Number                : 0
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (T11OUT)
+;
+; PCU (PA1)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 1 a 5 ]
+;    Pin Number                : 1
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 5 (CP0P0)
+;
+; PCU (PB6)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 6 a 0'
+mpause 30
+
+; PCU (PA1)
+sendln 'port 0 1 a 6'
+mpause 30
+
+; Timer11
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 p 0 3199'
+mpause 30
+sendln 'config 1 i p h 10000 10000'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 1'
+mpause 100
+
+; CMP0
+sendln 'cm cmp'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 i m 0 6 h b -dbc 6 0 d -ext m d e'
+mpause 30
+sendln 'log on 0'
+mpause 30
+sendln 'start 0'

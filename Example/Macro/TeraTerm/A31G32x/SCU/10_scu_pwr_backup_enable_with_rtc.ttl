@@ -1,0 +1,73 @@
+; A. Description
+;    A list of commands here configures SCU PWR and backup power mode.
+;
+; B. Preparation
+;    Supply power to external power port by a suitable instrument or make a environment to generate low voltage under 1.6V. 
+;    Measure PC13 port whether proper frequency is available or not.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. SCUPWR
+;    2. SCULVD
+;    3. RTC
+;    4. PCU/GPIO
+;
+; D. Default Port
+;    1. RTC0   : PC13 (RTC Clock Output)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; SCUPWR
+; 1. BAK                         : [ e ]
+;    Backup Mode                 : e (enable)
+;
+; SCULVR
+; 1. LVR                         : [ d ]
+;    Enable                      : d (disable)
+;
+; RTC0
+; 1. Channel                     : 0 (RTC 0)
+;
+; 2. Clock                       : [ 0 l ]
+;    Source                      : l (LSI40KHz)
+;
+; 3. Config                      : [ 0 i -meas ]
+;    Operation                   : i (Interrupt)
+;    Measuring fRTC at PC13 port : N/A
+;
+; PCU (PC13)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 1 13 a 7 ]
+;    Pin Number                : 13
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 7 (RTC_TAMP1)
+;
+; PCU (PC13)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 13 a 7'
+mpause 30
+
+; RTC0
+sendln 'cm rtc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 l'
+mpause 30
+sendln 'config 0 i -meas'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; SCULVD
+sendln 'cm sculvd'
+mpause 30
+sendln 'lvr d'
+
+; SCUPWR
+sendln 'cm scupwr'
+mpause 30
+sendln 'bak e'

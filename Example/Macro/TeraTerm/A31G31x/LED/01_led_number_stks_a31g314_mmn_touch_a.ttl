@@ -1,0 +1,156 @@
+; A. Description
+;    A list of commands here configures LED module as ram mode and displays a digit on LED matrix
+;
+; B. Preparation
+;    Connecting ports with LED Matrix should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. LED
+;    2. PCU/GPIO
+;
+; D. Note
+;    Should use UART1 as a debug log port at stks-a31g314_mmn_touch_a board.
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; - LED Matrix (Tested) : stks-a31g314_mmn_touch_a
+;
+; 1. Channel                    : 0 (LED)
+;
+; 2. Clock                      : [ 0 m h 24 3 ]
+;    Source                     : MCCR (Misc Clock) / HSI (High Speed Internal Clock)
+;    Source Divide              : 24
+;    LED Pre-Divide             : 3
+;
+; 3. Config                     : [ 0 i r a 1 255 0 -overlap 8 ]
+;    Operation                  : i (Interrupt)
+;    Display Mode (RAM / Port)  : r (RAM)
+;    Mode                       : a (Alone)
+;    Port Share Mode            : 1 (iseq0-iseq1)
+;    Pulse Width                : 255 ( Clock / (Width + 1) )
+;    Stop Duration              : 0
+;    Overlap                    : 8
+;
+; 4. Icom                       : [ 0 6 7 12 13 15 16 17 18 24 ]
+;    Icom Number                : 6, 7, 12, 13, 15, 16, 17, 18, 24
+;
+; 5. Iseg                       : [ 0 2 4 5 6 7 8 9 ]
+;    Iseg Number                : 2, 4, 5, 6, 7, 8, 9
+;
+; 6. Dim                        : [ 0 7 0 6 0 12 0 13 0 15 0 16 0 17 0 18 0 24 0 ]
+;    Icom Number / Dimming      : 7 0, 6 0, 12 0, 13 0, 15 0, 16 0, 17 0, 18 0, 24 0
+;
+; 7. Data                       : [ 0 7 0x000 6 0x000 12 0x000 13 0x3c4 15 0x044 16 0x3c4 17 0x000 18 0x000 24 0x000 ]
+;    Icom Number / ISeg Data    : 7 0x000, ..., 24 0x000
+;     - ISeg Data (Bit Order)
+;
+; PCU (ICOM)
+; 1. Port Group                : 3 / 4 (PCU Port B / C / D / E)
+;
+; 2. Port                      : [ 1 2 a 4 ] [ 2 0 a 4 ] [ 2 1 a 4 ] [ 2 2 a 4 ] [ 2 3 a 4 ] [ 3 0 a 4 ] [ 3 1 a 4 ] [ 4 6 a 4 ] [ 4 7 a 4 ]
+;    Pin Number                : 2 / 0 / 1 / 2 / 3 / 0 / 1 / 6 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (ICOM24) / 4 (ICOM18) / 4 (ICOM17) / 4 (ICOM16) / 4 (ICOM15) / 4 (ICOM13) / 4 (ICOM12) / 4 (ICOM7) / 4 (ICOM6)
+;
+; PCU (SEG)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 0 a 4 ] [ 0 1 a 4 ] [ 0 2 a 4 ] [ 0 3 a 4 ] [ 0 4 a 4 ] [ 0 5 a 4 ] [ 0 7 a 4 ]
+;    Pin Number                : 0 / 1 / 2 / 3 / 4 / 5 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (ISEG9) / 4 (ISEG8) / 4 (ISEG7) / 4 (ISEG6) / 4 (ISEG5) / 4 (ISEG4) / 4 (ISEG2) 
+;
+; PCU
+sendln 'cm pcu'
+mpause 30
+
+; ICOM
+sendln 'port 1 2 a 4'
+mpause 30
+sendln 'port 2 0 a 4'
+mpause 30
+sendln 'port 2 1 a 4'
+mpause 30
+sendln 'port 2 2 a 4'
+mpause 30
+sendln 'port 2 3 a 4'
+mpause 30
+sendln 'port 3 0 a 4'
+mpause 30
+sendln 'port 3 1 a 4'
+mpause 30
+sendln 'port 4 6 a 4'
+mpause 30
+sendln 'port 4 7 a 4'
+mpause 30
+
+; SEG
+sendln 'port 0 0 a 4'
+mpause 30
+sendln 'port 0 1 a 4'
+mpause 30
+sendln 'port 0 2 a 4'
+mpause 30
+sendln 'port 0 3 a 4'
+mpause 30
+sendln 'port 0 4 a 4'
+mpause 30
+sendln 'port 0 5 a 4'
+mpause 30
+sendln 'port 0 7 a 4'
+mpause 30
+
+sendln 'cm led'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 24 3'
+mpause 30
+sendln 'config 0 i r a 1 255 0 -overlap 8'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'icom 0 6 7 12 13 15 16 17 18 24'
+mpause 30
+sendln 'iseg 0 2 4 5 6 7 8 9'
+mpause 30
+sendln 'dim 0 7 0 6 0 12 0 13 0 15 0 16 0 17 0 18 0 24 0'
+mpause 30
+; num 0
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x3c4 15 0x044 16 0x3c4 17 0x000 18 0x000 24 0x000'
+mpause 30
+sendln 'start 0 10000'
+pause 1
+; num 1
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x000 15 0x3c4 16 0x000 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 2
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x1c4 15 0x144 16 0x344 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 3
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x144 15 0x144 16 0x3c4 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 4
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x304 15 0x100 16 0x3c4 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 5
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x344 15 0x144 16 0x1c4 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 6
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x3c4 15 0x144 16 0x1c4 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 7
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x004 15 0x004 16 0x3c4 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 8
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x3c4 15 0x144 16 0x3c4 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 9
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x344 15 0x144 16 0x3c4 17 0x000 18 0x000 24 0x000'
+pause 1
+; num 0
+sendln 'data 0 7 0x000 6 0x000 12 0x000 13 0x3c4 15 0x044 16 0x3c4 17 0x000 18 0x000 24 0x000'
+pause 5
+sendln 'stop 0'

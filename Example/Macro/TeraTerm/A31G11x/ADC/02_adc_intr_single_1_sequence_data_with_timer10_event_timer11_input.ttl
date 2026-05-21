@@ -1,0 +1,150 @@
+; A. Description
+;    A list of commands here configures ADC and generates single capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+; 
+; C. Prerequisite Example (abov_example_config.h)
+;    1. ADC
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. ADC0    : PB2 (AN10)
+;    2. Timer11 : PE7 (Output/Capture Input)
+;
+; E. Port Connection
+;    1. PB2 (AN10) <----> PE7 (Timer11 Output)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; ADC0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 p 31 ]
+;    Source                     : p (Periperhal Clock)
+;    Peripheral Clock Divide    : 31 (Divide + 1)
+;
+; 3. Config                     : [ config 0 i i ]
+;    Operation                  : i (Interrupt)
+;    Reference Level            : i (Internal VDD)
+;
+; 4. Seq                        : [ 0 1 0 10 ]
+;    Trigger Source             : 1 (Timer1)
+;    Trigger Source Number      : 0 (Timer10)
+;    Input Channel              : 10
+;
+; Timer10
+; 1. Channel                    : 0 (Timer10)
+;
+; 2. Clock                      : [ 0 p 0 3999 ]
+;    Source                     : p (PCLK)
+;    Source Divide              : 0 (Not available)
+;    Timer1 Pre-Divide          : 3999 (Pre-Divide + 1)
+;
+; 3. Config                     : [ 0 i p h 10000 10000 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : p (Period)
+;    Output Port Polarity       : h (High)
+;    A Data                     : 10000 
+;    B Data                     : 10000
+;
+; Timer11
+; 1. Channel                    : 1 (Timer11)
+;
+; 2. Clock                      : [ 1 p 0 3999 ]
+;    Source                     : p (PCLK)
+;    Source Divide              : 0 (Not available)
+;    Timer1 Pre-Divide          : 3999 (Pre-Divide + 1)
+;
+; 3. Config                     : [ 1 i p h 20000 20000 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : p (Period)
+;    Output Port Polarity       : h (High)
+;    A Data                     : 20000
+;    B Data                     : 20000
+;
+; PCU (PE7)
+; 1. Port Group                 : 4 (PCU Port E)
+;
+; 2. Port                       : [ 4 7 a 1 ]
+;    Pin Number                 : 7
+;    Pin Mode                   : a (Alternative)
+;    Alternative                : 1 (Timer11 Output)
+; 
+; PCU (PB2)
+; 1. Port Group                : 1 (PCU Port B)
+;
+; 2. Port                      : [ 1 2 a 3 ]
+;    Pin Number                : 2
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 (AN10)
+;
+; PCU
+sendln 'cm pcu'
+mpause 30
+sendln 'port 4 7 a 1'
+mpause 30
+sendln 'port 4 6 a 0'
+mpause 30
+sendln 'port 3 7 a 0'
+mpause 30
+
+; PCU (PB2)
+sendln 'port 1 2 a 3'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 0 3999'
+mpause 30
+sendln 'config 0 i p h 10000 10000'
+mpause 30
+
+; Timer11
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 p 0 3999'
+mpause 30
+sendln 'config 1 i p h 20000 20000'
+mpause 30
+
+; ADC 
+sendln 'cm adc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 31'
+mpause 30
+sendln 'config 0 i i'
+mpause 30
+sendln 'seq 0 1 0 10'
+mpause 30
+sendln 'log on'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; Timer11
+sendln 'start 1'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'start 0'

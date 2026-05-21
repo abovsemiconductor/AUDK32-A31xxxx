@@ -1,0 +1,177 @@
+; A. Description
+;    This script automatically executes some of Timer1, Timer2, and Timer3 Tera Term example scripts.
+;
+; B. Prerequisite Example (abov_example_config.h)
+;    1. Timer1
+;    2. Timer2
+;    3. Timer3
+;
+
+timeout=600
+Passstr='===== Test Result : Pass ====='#13#10
+Failstr='===== Test Result : Fail ====='#13#10
+Reviewstr='===== Test Result : Need Review ===='#13#10
+NeedReview=0
+
+getdir mdir
+foldercreate 'Result'
+
+fileret='04_Autotest_Result_Timers'
+sprintf2 retfilename '%s\Result\%s.txt' mdir fileret
+sprintf2 delfilename 'Result\%s.txt' fileret
+filedelete delfilename
+fileopen frethnd retfilename 0
+
+call tctimer1
+call tctimer2
+call tctimer3
+
+fileclose frethnd
+dispstr 'End of 4. Auto Test Timers'
+dispstr 10
+dispstr 'Must process the remained Timers TC.'
+end
+
+:tctimer1
+; ===== START : TestCase Timer1 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer1 ====='
+dispstr 10
+
+ipstr='Timer1'
+foldercreate ipstr
+
+filestr='01_timer1_intr_period'
+chkstr='TIMER1 : (0) P evt fire'
+delay=2
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_timer1_intr_oneshot'
+chkstr='TIMER1 : (0) P evt fire'
+delay=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer1_intr_pwm'
+chkstr='TIMER1 : (0) PWM P evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase Timer1 =====
+dispstr 10
+dispstr '===== END : TestCase Timer1 ====='
+dispstr 10
+return
+
+:tctimer2
+; ===== START : TestCase Timer2 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer2 ====='
+dispstr 10
+
+ipstr='Timer2'
+foldercreate ipstr
+
+filestr='01_timer2_intr_period'
+chkstr='TIMER2 : (0) P evt fire'
+delay=2
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_timer2_intr_oneshot'
+chkstr='TIMER2 : (0) P evt fire'
+delay=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer2_intr_pwm'
+chkstr='TIMER2 : (0) PWM P evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase Timer2 =====
+dispstr 10
+dispstr '===== END : TestCase Timer2 ====='
+dispstr 10
+return
+
+:tctimer3
+; ===== START : TestCase Timer3 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer3 ====='
+dispstr 10
+
+ipstr='Timer3'
+foldercreate ipstr
+
+filestr='01_timer3_intr_interval'
+chkstr='TIMER3 : (0) P evt fire'
+delay=6
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer3_intr_back2back'
+chkstr='TIMER3 : (0) B evt fire'
+delay=10
+call dotest
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase Timer3 =====
+dispstr 10
+dispstr '===== END : TestCase Timer3 ====='
+dispstr 10
+return
+
+:dotest
+sprintf2 filename '%s\%s\%s.log' mdir ipstr filestr
+sprintf2 delfilename '%s\%s.log' ipstr filestr
+filedelete delfilename
+sprintf2 logstr 'Test %s' filestr
+sprintf2 testfile '..\%s\%s.ttl' ipstr filestr
+logopen filename 0 0
+logwrite logstr
+include testfile
+pause delay
+logclose
+call decision
+return
+
+:decision
+timeout=600
+fileopen fhandle filename 0
+if NeedReview == 1 then
+    resultstr=Reviewstr
+else
+    filestrseek fhandle chkstr
+    if result=0 then
+        resultstr=Failstr
+    else 
+        resultstr=Passstr
+    endif
+endif
+
+fileseek fhandle 0 0
+do
+    filereadln fhandle line
+    filewriteln frethnd line
+loop while result == 0
+filewriteln frethnd resultstr
+filewriteln frethnd 0
+filewriteln frethnd 0
+fileclose fhandle
+NeedReview=0
+resultstr=''
+pause 1
+
+return

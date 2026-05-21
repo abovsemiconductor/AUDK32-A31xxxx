@@ -1,0 +1,121 @@
+; A. Description
+;    A list of commands here configures USART as USRT and receives data.
+;
+; B. Preparation
+;    Connecting ports with a suitable instrument should be correct
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. USART
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. USART1  : PA4 (Serial Clock)
+;               : PA2 (Transmit)
+;               : PA3 (Receive)
+;    2. USART2  : PC12 (Serial Clock)
+;               : PC10 (Transmit)
+;               : PC11 (Receive)
+;
+; E. Port Connection
+;    1. PA4 (Serial Clock)  <----> PC12 (Serial Clock)
+;    2. PA2 (Transmit)      <----> PC11 (Receive)
+;    3. PA3 (Receive)       <----> PC10 (Transmit)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; USART1
+; 1. Channel                   : 1 (USART1)
+;
+; 2. Config                    : [ 1 i a m 8 n 1 0 38400 ]
+;    Operation                 : i (Interrupt)
+;    USART Mode                : a (USRT)
+;    USRT Mode                 : m (Master)
+;    Data Bit                  : 8 (8bit)
+;    Parity                    : n (None)
+;    Stop Bit                  : 1 (1bit)
+;    Polarity                  : 0 (Tx Rising and Rx Falling Edge)
+;    Baudrate                  : 38400 bps
+;
+; 3. Data                      : [ 1 8 0xaa 0x55 0x10 0x01 0xff 0x5a 0xa5 0xff ]
+;    Data Length               : 8
+;    Data                      : 0xa5 ... (Hexa and space (delimitor))
+;
+; 4. Tx                        : [ 1 8 ]
+;    Receive Data Length       : 8
+;
+; USART2
+; 1. Channel                   : 2 (USART2)
+;
+; 2. Config                    : [ 2 i a s 8 n 1 0 38400 ]
+;    Operation                 : i (Interrupt)
+;    USART Mode                : a (USRT)
+;    USRT Mode                 : s (Slave)
+;    Data Bit                  : 8 (8bit)
+;    Parity                    : n (None)
+;    Stop Bit                  : 1 (1bit)
+;    Polarity                  : 0 (Tx Rising and Rx Falling Edge)
+;    Baudrate                  : 38400 bps
+;
+; 3. Rx                        : [ 2 8 ]
+;    Receive Data Length       : 8
+;
+; PCU (PAx)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 4 a 2 -pupd p ] [ 0 2 a 0 -pupd p ] [ 0 3 a 0 -pupd p ]
+;    Pin Number                : 4 / 2 / 3
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 / 0 / 0 (SCK/Tx/Rx)
+;    Pull-up/down              : p (Pull-up)
+;
+; PCU (PCx)
+; 1. Port Group                : 2 (PCU Port C)
+; 
+; 2. Port                      : [ 2 12 a 3 -pupd p ] [ 2 10 a 2 -pupd p ] [ 1 11 a 2 -pupd p ]
+;    Pin Number                : 12 / 10 / 11
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 / 2 / 2 (SCK/Tx/Rx)
+;    Pull-up/down              : p (Pull-up)
+;
+; PCU (PAx)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 4 a 2 -pupd p'
+mpause 30
+sendln 'port 0 2 a 0 -pupd p'
+mpause 30
+sendln 'port 0 3 a 0 -pupd p'
+mpause 30
+
+; PCU (PCx)
+sendln 'port 2 12 a 3 -pupd p'
+mpause 30
+sendln 'port 2 10 a 2 -pupd p'
+mpause 30
+sendln 'port 2 11 a 2 -pupd p'
+mpause 30
+
+; USART2
+sendln 'cm usart'
+mpause 30
+sendln 'uninit 2'
+mpause 30
+sendln 'init 2'
+mpause 30
+sendln 'config 2 i a s 8 n 1 0 38400'
+mpause 30
+sendln 'rx 2 8'
+mpause 30
+
+; USART1
+sendln 'cm usart'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'config 1 i a m 8 n 1 0 38400'
+mpause 30
+sendln 'data 1 8 0xaa 0x55 0x10 0x01 0xff 0x5a 0xa5 0xff'
+mpause 30
+sendln 'tx 1 8'

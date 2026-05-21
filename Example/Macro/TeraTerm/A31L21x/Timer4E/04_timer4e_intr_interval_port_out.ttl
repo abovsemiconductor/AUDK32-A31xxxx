@@ -1,0 +1,50 @@
+; A. Description
+;    A list of commands here configures timer4 and generates a interval interrupt (Period, A, B).
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer4E
+;
+; D. Default Port
+;    1. Timer4E0 : PE0 (PWM AA Output)
+;                : PE1 (PWM AB Output)
+;                : PE2 (PWM BA Output)
+;                : PE3 (PWM BB Output)
+;                : PE4 (PWM CA Output)
+;                : PE5 (PWM CB Output)
+;                : PF7 (Capture Input)
+;                : PF6 (External Clock Input)
+;                : PF5 (BLANK Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer4E0
+; 1. Channel                   : 0 (Timer4E0)
+;
+; 2. Clock                     : [ 0 p 4095 ]
+;    Source                    : p (PCLK)
+;    Timer4e Pre-Divide        : 4095 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 0 i i -port 7812 3906 3906 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Period                    : 7814
+;    A Data                    : 3907
+;    B Data                    : 3907
+;
+; Timer4E0
+sendln 'cm timer4e'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 4095'
+mpause 30
+sendln 'config 0 i i -port -pa e h -pb d h 7812 3906 3906'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

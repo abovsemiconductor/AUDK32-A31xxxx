@@ -1,0 +1,160 @@
+; A. Description
+;    A list of commands here configure 7-segment(port mode) and displays a digit on it.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. LED
+;    2. PCU/GPIO
+;
+; D. Note
+;    Should use UART1 as a debug log port at stks-a31g213cl2n_tb board.
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; - 7-segment (Tested) : stks-a31g213cl2n_tb
+;
+; LED0
+; 1. Channel                    : 0 (LED)
+;
+; 2. Clock                      : [ 0 m h 1 64 ]
+;    Source                     : MCCR (Misc Clock) / HSI (High Speed Internal Clock)
+;    Source Divide              : 1
+;    LED Pre-Divide             : 64
+;
+; 3. Config                     : [ 0 i p a 1 127 0 -overlap 32]
+;    Operation                  : i (Interrupt)
+;    Display Mode (RAM / Port)  : p (Port)
+;    Mode                       : a (Alone)
+;    Port Share Mode            : 1 (iseq0-iseq1)
+;    Pulse Width                : 127 ( Clock / (Width + 1) )
+;    Stop Duration              : 0
+;    Overlap                    : 32
+;
+; 4. Icom                       : [ 0 3 4 5 6 ]
+;    Icom Number                : 3, 4, 5, 6
+;
+; 5. Iseg                       : [ 0 0 1 2 3 4 5 6 7 ]
+;    Iseg Number                : 0, 1, 2, 3, 4, 5, 6, 7
+;
+; 6. Dim                        : [ 0 3 218 4 218 5 218 6 218 ]
+;    Icom Number / Dimming      : 3 218, 4 218, 5 218, 6 218
+;
+; 7. Data                       : [ 0 3 0x3FF 4 0x3FF 5 0x3FF 6 0x3FF ]
+;    Icom Number / ISeg Data    : 3 0x3FF, 4 0x3FF, 5 0x3FF, 6 0x3FF
+;     - ISeg Data (Bit Order)
+;
+; PCU (COM)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 0 a 4 ] [ 2 1 a 4 ] [ 2 2 a 4 ] [ 2 3 a 4 ]
+;    Pin Number                : 0 / 1 / 2 / 3
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (ICOM6) / 4 (ICOM5) / 4 (ICOM4) / 4 (ICOM3)
+;
+; PCU (SEG)
+; 1. Port Group                : 3 / 4 (PCU Port D / E)
+;
+; 2. Port                      : [ 3 4 a 4 ] [ 3 5 a 4 ] [ 4 2 a 4 ] [ 4 3 a 4 ] [ 4 4 a 4 ] [ 4 5 a 4 ] [ 4 6 a 4 ] [ 4 7 a 4 ]
+;    Pin Number                : 4 / 5 / 2 / 3 / 4 / 5 / 6 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (SEG7) / 4 (SEG6) / 4 (SEG0) / 4 (SEG1) / 4 (SEG2) / 4 (SEG3) / 4 (SEG4) / 4 (SEG5) 
+;
+;FND Port configuration
+;STKS_A31G213CL2N_TB 7-SEGMENT INFO
+;- DIGIT 0: COM3
+;- DIGIT 1: COM4
+;- DIGIT 2: COM5
+;- DIGIT 3: COM6
+;- SEGMENT : SEG0 to SEG7
+;      --(0)--
+;     |       |
+;    (5)      (1)
+;     |--(6)--|
+;    (4)      (2)
+;     |       |
+;      --(3)-- *(7)
+;
+;- 7-seg number
+; [0:0x3F] [1:0x6] [2:0x5B] [3:0x4F] [4:0x66] [5:6D] [6:7D] [7:0x07] [8:0x7F] [9:0x6F]
+
+; PCU
+sendln 'cm pcu'
+mpause 30
+
+; ICOM
+sendln 'port 2 0 a 4'
+mpause 30
+sendln 'port 2 1 a 4'
+mpause 30
+sendln 'port 2 2 a 4'
+mpause 30
+sendln 'port 2 3 a 4'
+mpause 30
+
+; SEG
+sendln 'port 3 4 a 4'
+mpause 30
+sendln 'port 3 5 a 4'
+mpause 30
+sendln 'port 4 2 a 4'
+mpause 30
+sendln 'port 4 3 a 4'
+mpause 30
+sendln 'port 4 4 a 4'
+mpause 30
+sendln 'port 4 5 a 4'
+mpause 30
+sendln 'port 4 6 a 4'
+mpause 30
+sendln 'port 4 7 a 4'
+mpause 30
+
+sendln 'cm led'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 1 64'
+mpause 30
+sendln 'config 0 i p a 1 127 0 -overlap 32'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'icom 0 3 4 5 6'
+mpause 30
+sendln 'iseg 0 0 1 2 3 4 5 6 7'
+mpause 30
+sendln 'dim 0 3 218 4 218 5 218 6 218'
+mpause 30
+; all display
+sendln 'data 0 3 0x3FF 4 0x3FF 5 0x3FF 6 0x3FF'
+pause 1
+sendln 'start 0 200'
+pause 2
+; num 0 1 2 3
+sendln 'data 0 3 0x3F 4 0x06 5 0x5B 6 0x4F'
+pause 1
+sendln 'start 0 1000'
+pause 6
+; num 4 5 6 7
+sendln 'data 0 3 0x66 4 0x6D 5 0x7D 6 0x07'
+pause 1
+sendln 'start 0 1000'
+pause 6
+; num 8 9 . all
+sendln 'data 0 3 0x7F 4 0x6F 5 0x80 6 0xFF'
+pause 1
+sendln 'start 0 1000'
+pause 6
+; update 0 ~ all
+sendln 'data 0 3 0x3F 4 0x06 5 0x5B 6 0x4F'
+pause 1
+sendln 'start 0 10000'
+pause 1
+sendln 'data 0 3 0x66 4 0x6D 5 0x7D 6 0x07'
+pause 1
+sendln 'data 0 3 0x7F 4 0x6F 5 0x80 6 0xFF'
+pause 1

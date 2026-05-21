@@ -1,0 +1,110 @@
+# A. Description
+#    A list of commands here configures UART and receives data.
+#
+# B. Preparation
+#    Connecting ports with a suitable instrument should be correct
+#
+# C. Prerequisite Example (abov_example_config.h)
+#    1. UART
+#    2. PCU/GPIO
+#
+# D. Default Port
+#    1. UART1   : PB6 (Transmit)
+#               : PB7 (Receive)
+#
+# For more information, read a user's manual of the target device carefully.
+#
+# UART1
+# 1. Channel                   : 1 (UART1)
+#
+# 2. CLK                       : [ 1 p ]
+#    Clock Source              : p (PCLK : Peripheral Clock Source)
+#
+# 3. Config                    : [ 1 i 8 o 1 38400 ]
+#    Operation                 : i (Interrupt)
+#    Data Bit                  : 8 (8bit)
+#    Parity                    : o (odd)
+#    Stop Bit                  : 1 (1bit)
+#    Baudrate                  : 38400 bps
+#
+# 4. Rx                        : [ 1 8 ]
+#    Receive Data Length       : 8
+#
+# PCU (PBx)
+# 1. Port Group                : 1 (PCU Port B)
+#
+# 2. Port                      : [ 1 6 a 1 -pupd p ] [ 1 7 a 1 -pupd p ]
+#    Pin Number                : 6 / 7 
+#    Pin Mode                  : a (Alternative)
+#    Alternative               : 1 (TX/RX)
+#    Pull-up/down              : p (Pull-up)
+#
+# PCU (PBx)
+send ""
+
+send "cm pcu"
+expect {
+    "<PCU> # "
+    break
+    timeout 5 goto end
+}
+
+send "port 1 6 a 1 -pupd p"
+expect {
+    "<PCU> # "
+    break
+    timeout 5 goto end
+}
+
+send "port 1 7 a 1 -pupd p"
+expect {
+    "<PCU> # "
+    break
+    timeout 5 goto end
+}
+
+
+# UART1
+send "cm uart"
+expect {
+    "<UART> # "
+    break
+    timeout 5 goto end
+}
+
+send "uninit 1"
+expect {
+    "<UART> # "
+    break
+    timeout 5 goto end
+}
+
+send "init 1"
+expect {
+    "<UART> # "
+    break
+    timeout 5 goto end
+}
+
+send "clk 1 p"
+expect {
+    "<UART> # "
+    break
+    timeout 5 goto end
+}
+
+send "config 1 i 8 o 1 38400"
+expect {
+    "<UART> # "
+    break
+    timeout 5 goto end
+}
+
+send "rx 1 8"
+expect {
+    "<UART> # "
+    break
+    timeout 5 goto end
+}
+
+end:

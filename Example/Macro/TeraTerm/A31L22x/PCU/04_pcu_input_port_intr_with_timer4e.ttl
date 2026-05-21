@@ -1,0 +1,92 @@
+; A. Description
+;    A list of commands here configures PCU module and generates input interrupt via the signal from timer1.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;    2. Timer4E
+;
+; D. Default Port
+;    1. PCU      : PA4 (Input)
+;    2. Timer4E3 : PA6/PA7/PA6 (OutputA/B/Capture Input)
+;                : PA7 (External Clock Input)
+;
+; E. Port Connection
+;    1. PA7 (Timer43 Output B) ----> PA4 (Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; PCU (PA4)
+; 1. Port Group                   : 0 (PCU Port A)
+;
+; 2. Port                         : [ 0 4 i i -intr i e r ]
+;    Pin Number                   : 4
+;    Pin Mode                     : i (Input)
+;    Pin Input Mode               : i (Normal Input)
+;    Pin Operation Mode           : i (Interrupt)
+;    Pin Interrupt Mode           : e (Edge)
+;    Pin Interrupt Trigger Edge   : r (Rising)
+;
+; Timer4E3
+; 1. Channel                   : 3 (Timer4E3)
+;
+; 2. Clock                     : [ 3 p 4095 ]
+;    Source                    : p (PCLK)
+;    Timer4e Pre-Divide        : 4095 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 3 i i -port -pb en h 7812 3906 3906 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Port                      : -pb (Port B)
+;    Port Output Enable        : en (Enable)
+;    Port Output Start Level   : h (High)
+;    Period                    : 7814
+;    A Data                    : 3907
+;    B Data                    : 3907
+;
+; PCU (PA7)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 7 a 0 ]
+;    Pin Number                : 7 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (T4E3OUT)
+;
+; PCU (PA4)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 4 i i -intr i e r'
+mpause 30
+sendln 'port 0 0 o o h'
+mpause 30
+sendln 'port 0 1 o o h'
+mpause 30
+sendln 'port 0 5 o o h'
+mpause 30
+sendln 'port 0 6 o o h'
+mpause 30
+sendln 'port 3 4 o o h'
+mpause 30
+sendln 'port 3 5 o o h'
+mpause 30
+
+; PCU (PA7)
+sendln 'port 0 7 a 0'
+mpause 30
+
+; Timer4E0
+sendln 'cm timer4e'
+mpause 30
+sendln 'uninit 3'
+mpause 30
+sendln 'init 3'
+mpause 30
+sendln 'clk 3 p 4095'
+mpause 30
+sendln 'config 3 i i -port -pb en h 7812 3906 3906'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 3'

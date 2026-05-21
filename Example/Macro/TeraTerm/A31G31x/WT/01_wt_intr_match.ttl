@@ -1,0 +1,36 @@
+; A. Description
+;    A list of commands here configures WT module and generates a match interrupt.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. WT
+;
+; Please, read the User Manual of the specific chip for more details.
+;
+; WT0
+; 1. Channel                   : 0 (WT0)
+;
+; 2. Clock                     : [ 0 w ]
+;    Source                    : w (WDTRC 31.250KHz)
+;
+; 3. Config                    : [ 0 i w 1 ]
+;    Operation                 : i (Interrupt)
+;    Divide                    : w (Clock / 2^14 * (Data + 1))
+;    Data                      : 1
+;
+; WT0
+sendln 'cm wt'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 w'
+mpause 30
+sendln 'config 0 i w 1'
+mpause 30
+sendln 'start 0'
+
+

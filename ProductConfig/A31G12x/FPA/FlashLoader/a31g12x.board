@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flash_board>
+    <pass>
+        <loader>$PROJ_DIR$\..\..\..\..\..\ProductConfig\A31G12x\FPA\FlashLoader\a31g12x_code.flash</loader>
+        <range>CODE 0x00000000 0x0000FFFF</range>
+    </pass>
+    <pass>
+        <loader>$PROJ_DIR$\..\..\..\..\..\ProductConfig\A31G12x\FPA\FlashLoader\a31g12x_opt.flash</loader>
+        <range>CODE 0x1FFFF200 0x1FFFF7FF</range>
+    </pass>
+</flash_board>

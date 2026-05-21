@@ -1,0 +1,30 @@
+; A. Description
+;    A list of commands here configures timer6 and generates a period interrupt.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer6
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer60
+; 1. Channel                   : 0 (Timer60)
+;
+; 2. Config                    : [ 0 i 2 ]
+;    Operation                 : i (Interrupt)
+;    Data                      : 2
+;
+; Timer60
+sendln 'cm timer6'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 i 2'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

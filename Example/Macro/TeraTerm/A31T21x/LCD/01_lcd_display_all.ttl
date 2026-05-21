@@ -1,0 +1,113 @@
+; A. Description
+;    A list of commands here configures LCD module and displays a number on LCD.
+;
+; B. Preparation
+;    Connecting ports with LCD should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. LCD
+;    2. PCU/GPIO
+;
+; D. Port Connection
+;    1. PE7 (LCD COM0)   <----> COM0 (Port1)
+;       PE6 (LCD COM1)   <----> COM1 (Port2)
+;       PE5 (LCD COM2)   <----> COM2 (Port3)
+;       PE4 (LCD COM3)   <----> COM3 (Port4)
+;       PA11 (LCD SEG12)   <----> SEG7 (Port5)
+;       PA10 (LCD SEG13)   <----> SEG8 (Port6)
+;       PA9 (LCD SEG14)   <----> SEG9 (Port7)
+;       PA8 (LCD SEG15)  <----> SEG10 (Port8)
+;       PA7 (LCD SEG16)  <----> SEG11 (Port9)
+;       PA6 (LCD SEG17)  <----> SEG12 (Port10)
+;       PA5 (LCD SEG18) <----> SEG13 (Port11)
+;       PA4 (LCD SEG19) <----> SEG14 (Port12)
+;       PA3 (LCD SEG20) <----> SEG15 (Port13)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; - LCD Board (Tested) : GDC8310 TN LCD
+;
+; LCD0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 m m 16 128 ]
+;    Source                     : m (MCCR : Misc Clock)
+;    MCCR Source                : m (MCLK : Main Clock)
+;    MCCR Source Divide         : 16
+;    LCD Pre-Divide             : 128
+;
+; 3. Config                     : [ 0 i 2 4 -auto 1 ]
+;    Bias                       : i (Internal)
+;    LCD Dividing Register      : 2 (66/66/50)
+;    Duty                       : 4 (1/4 duty, 1/3 bias)
+;    Timing by Auto Bias(-auto) : 1 (1 clock)
+;
+; 4. Data                       : [ 0 12 0x0F 13 0x0F 14 0x0F 15 0x0F 16 0x0F 17 0x0F 18 0x0F 19 0x0F 20 0x0F ]
+;    Seg Number                 : 12, 13, 14, 15, 16, 17, 18, 19, 20
+;    Com Bit                    : 0x0F (Com0, Com1, Com2, Com3)
+;
+; PCU (COM)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 4 a 0 ] [ 4 5 a 0 ] [ 4 6 a 0 ] [ 4 7 a 0 ]
+;    Pin Number                : 4 / 5 / 6 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (COM3) / 0 (COM2) / 0 (COM1) / 0 (COM0)
+;
+; PCU (SEG)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 3 a 0 ] [ 0 4 a 0 ] [ 0 5 a 0 ] [ 0 6 a 0 ] [ 0 7 a 0 ] [ 0 8 a 0 ] [ 0 9 a 0 ] [ 0 10 a 0 ] [ 0 11 a 0 ]
+;    Pin Number                : 3 / 4 / 5 / 6 / 7 / 8 / 9 / 10 / 11
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (SEG20) / 0 (SEG19) / 0 (SEG18) / 0 (SEG17) / 0 (SEG16) / 0 (SEG15) / 0 (SEG14) / 0 (SEG13) / 0 (SEG12)
+;
+; PCU
+sendln 'cm pcu'
+mpause 30
+; COM
+sendln 'port 4 4 a 0'
+mpause 30
+sendln 'port 4 5 a 0'
+mpause 30
+sendln 'port 4 6 a 0'
+mpause 30
+sendln 'port 4 7 a 0'
+mpause 30
+
+; SEG
+sendln 'port 0 3 a 0'
+mpause 30
+sendln 'port 0 4 a 0'
+mpause 30
+sendln 'port 0 5 a 0'
+mpause 30
+sendln 'port 0 6 a 0'
+mpause 30
+sendln 'port 0 7 a 0'
+mpause 30
+sendln 'port 0 8 a 0'
+mpause 30
+sendln 'port 0 9 a 0'
+mpause 30
+sendln 'port 0 10 a 0'
+mpause 30
+sendln 'port 0 11 a 0'
+mpause 30
+
+; LCD0
+sendln 'cm lcd'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m m 16 128'
+mpause 30
+sendln 'config 0 i 2 4 -auto 1'
+mpause 30
+sendln 'data 0 12 0x0F 13 0x0F 14 0x0F 15 0x0F 16 0x0F 17 0x0F 18 0x0F 19 0x0F 20 0x0F'
+mpause 30
+sendln 'disp 0 on'
+pause 10
+sendln 'disp 0 off'

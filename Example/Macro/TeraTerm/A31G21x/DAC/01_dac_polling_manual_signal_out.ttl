@@ -1,0 +1,47 @@
+; A. Description
+;    A list of commands here configures DAC and generates analog signal out by specific data.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. DAC
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. DAC0    : PA7 (DAO)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; DAC0
+; 1. Config                     : [ 0 p m i c -port 0x1]
+;    Operation                  : p (Polling)
+;    Mode                       : m (Manual)
+;    Reference Level            : i (Internal VDD)
+;    Re-load reference          : c (Constant)
+;    Output Port (-port)        : 0x01 (Port 1)
+;
+; PCU (DAC0)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 7 a 3 ]
+;    Pin Number                : 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 3 (DACO)
+
+; PCU
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 7 a 3'
+mpause 30
+
+; DAC0
+sendln 'cm dac'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 p m i c -port -0x1'
+mpause 30
+sendln 'start 0'

@@ -1,0 +1,412 @@
+; A. Description
+;    This script automatically executes WDT, WT, CRC, some of PCU, and SCU Tera Term example scripts.
+;
+; B. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;    2. WDT
+;    3. WT
+;    4. CRC
+;    5. FMC
+;    6. SCU
+;    7. Timer1
+;    8. Timer2
+;    9. ADC
+;
+; C. Port Connection
+;    1. PCU
+;     : PB10 (Output)         ----> PB11 (Input)
+;     : PC6  (Timer11 Output) ----> PC4 (Input)
+;    2. TIMER1
+;     : PC0 (Timer21 Output) ----> PC1 (Timer14 Capture Input)
+;     : PC0 (Timer21 Output) ----> PC1 (Timer14 External Clock Input)
+;    3. TIMER2
+;     : PC1 (Timer14 Output) ----> PC0 (Timer21 Capture Input)
+;     : PC1 (Timer14 Output) ----> PC0 (Timer21 External Clock Input)
+;    4. ADC
+;     : PA1 (AN1) <----> PB5 (Timer12 Output)
+;
+
+timeout=600
+Passstr='===== Test Result : Pass ====='#13#10
+Failstr='===== Test Result : Fail ====='#13#10
+Reviewstr='===== Test Result : Need Review ===='#13#10
+NeedReview=0
+
+getdir mdir
+foldercreate 'Result'
+
+fileret='01_Autotest_WDT_WT_CRC_FMC_PCU_SCU_TIMERs_ADC'
+sprintf2 retfilename '%s\Result\%s.txt' mdir fileret
+sprintf2 delfilename 'Result\%s.txt' fileret
+filedelete delfilename
+fileopen frethnd retfilename 0
+
+call tcwdt
+call tcwt
+call tccrc
+call tcfmc
+call tcpcu
+call tcscu
+call tctimer1
+call tctimer2
+call tcadc
+
+fileclose frethnd
+dispstr 'End of 1. Auto Test WDT/WT/CRC/FMC/PCU/SCU/TIMERs/ADC'
+dispstr 10
+dispstr 'Must process the remained PCU/SCU TC.'
+end
+
+:tcwdt
+; ===== START : TestCase WDT =====
+dispstr 10 10
+dispstr '===== START : TestCase WDT ====='
+dispstr 10
+
+ipstr='WDT'
+foldercreate ipstr
+
+filestr='01_wdt_intr_maskable_match'
+chkstr='WDT : (0) M evt fired'
+delay=3
+call dotest
+
+filestr='03_wdt_intr_reset'
+chkstr='= Executable module list ='
+delay=12
+call dotest
+
+filestr='04_wdt_intr_underflow'
+chkstr='WDT : (0) U evt fired'
+delay=5
+call dotest
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase WDT =====
+dispstr 10
+dispstr '===== END : TestCase WDT ====='
+dispstr 10
+return
+
+:tcwt
+; ===== START : TestCase WT =====
+dispstr 10 10
+dispstr '===== START : TestCase WT ====='
+dispstr 10
+
+ipstr='WT'
+foldercreate ipstr
+
+filestr='01_wt_intr_match'
+chkstr='WT : (0) M evt fired'
+delay=5
+call dotest
+sendln 'stop 0'
+
+; ===== END : TestCase WT =====
+dispstr 10
+dispstr '===== END : TestCase WT ====='
+dispstr 10
+return
+
+:tccrc
+; ===== START : TestCase CRC =====
+dispstr 10 10
+dispstr '===== START : TestCase CRC ====='
+dispstr 10
+
+ipstr='CRC'
+foldercreate ipstr
+
+filestr='01_crc_poll_poly_16'
+chkstr='0x826e'
+delay=1
+call dotest
+
+filestr='02_crc_poll_poly_ccitt'
+chkstr='0x7969'
+delay=1
+call dotest
+
+filestr='03_checksum_poll'
+chkstr='0x165'
+delay=1
+call dotest
+
+; ===== END : TestCase CRC =====
+dispstr 10
+dispstr '===== END : TestCase CRC ====='
+dispstr 10
+return
+
+:tcfmc
+; ===== START : TestCase FMC =====
+dispstr 10 10
+dispstr '===== START : TestCase FMC ====='
+dispstr 10
+
+ipstr='FMC'
+foldercreate ipstr
+
+filestr='01_flash'
+chkstr='End of Flash'
+delay=1
+NeedReview=1
+call dotest
+NeedReview=0
+
+; ===== END : TestCase FMC =====
+dispstr 10
+dispstr '===== END : TestCase FMC ====='
+dispstr 10
+return
+
+:tcpcu
+; ===== START : TestCase PCU =====
+dispstr 10 10
+dispstr '===== START : TestCase PCU ====='
+dispstr 10
+
+ipstr='PCU'
+foldercreate ipstr
+
+filestr='03_pcu_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='05_pcu_output_port_level_change_and_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='06_pcu_output_port_sustain_level_and_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+; ===== END : TestCase PCU =====
+dispstr 10
+dispstr '===== END : TestCase PCU ====='
+dispstr 10
+return
+
+:tcscu
+; ===== START : TestCase SCU =====
+dispstr 10 10
+dispstr '===== START : TestCase SCU ====='
+dispstr 10
+
+ipstr='SCU'
+foldercreate ipstr
+
+filestr='06_scu_reset'
+chkstr='= Executable module list ='
+delay=3
+call dotest
+
+; ===== END : TestCase SCU =====
+dispstr 10
+dispstr '===== END : TestCase SCU ====='
+dispstr 10
+return
+
+:tctimer1
+; ===== START : TestCase Timer1 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer1 ====='
+dispstr 10
+
+ipstr='Timer1'
+foldercreate ipstr
+
+filestr='01_timer1_intr_period'
+chkstr='TIMER1 : (0) P evt fire'
+delay=2
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_timer1_intr_oneshot'
+chkstr='TIMER1 : (0) P evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer1_intr_pwm'
+chkstr='TIMER1 : (0) PWM P evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='04_timer1_intr_capture'
+chkstr='TIMER1 : (4) C-A evt fire'
+delay=3
+call dotest
+sendln 'stop 4'
+pause 1
+sendln 'cm timer2'
+mpause 30
+sendln 'stop 1'
+pause 1
+
+filestr='06_timer1_intr_ext_clk_input_with_timer11'
+chkstr='TIMER1 : (4) P evt fire'
+delay=3
+call dotest
+sendln 'stop 4'
+pause 1
+sendln 'cm timer2'
+mpause 30
+sendln 'stop 1'
+pause 1
+
+; ===== END : TestCase Timer1 =====
+dispstr 10
+dispstr '===== END : TestCase Timer1 ====='
+dispstr 10
+return
+
+:tctimer2
+; ===== START : TestCase Timer2 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer2 ====='
+dispstr 10
+
+ipstr='Timer2'
+foldercreate ipstr
+
+filestr='01_timer2_intr_period'
+chkstr='TIMER2 : (0) P evt fire'
+delay=2
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_timer2_intr_oneshot'
+chkstr='TIMER2 : (0) P evt fire'
+delay=2
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer2_intr_pwm'
+chkstr='TIMER2 : (0) PWM P evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='04_timer2_intr_capture'
+chkstr='TIMER2 : (1) C-A evt fire'
+delay=3
+call dotest
+sendln 'stop 1'
+pause 1
+sendln 'cm timer1'
+mpause 30
+sendln 'stop 4'
+pause 1
+
+filestr='06_timer2_intr_ext_clk_input_with_timer21'
+chkstr='TIMER2 : (1) P evt fire'
+delay=3
+call dotest
+sendln 'stop 1'
+pause 1
+sendln 'cm timer1'
+mpause 30
+sendln 'stop 4'
+pause 1
+
+; ===== END : TestCase Timer2 =====
+dispstr 10
+dispstr '===== END : TestCase Timer2 ====='
+dispstr 10
+return
+
+:tcadc
+; ===== START : TestCase ADC =====
+dispstr 10 10
+dispstr '===== START : TestCase ADC ====='
+dispstr 10
+
+ipstr='ADC'
+foldercreate ipstr
+
+filestr='01_adc_intr_single_1_sequence_data_with_timer1_input'
+chkstr=''
+delay=1
+NeedReview=1
+call dotest
+
+filestr='02_adc_intr_single_1_sequence_data_with_timer10_event_timer11_input'
+chkstr=''
+delay=25
+NeedReview=1
+call dotest
+sendln 'stop 0'
+mpause 30
+sendln 'cm timer1'
+mpause 30
+sendln 'stop 2'
+mpause 30
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase ADC =====
+dispstr 10
+dispstr '===== END : TestCase ADC ====='
+dispstr 10
+return
+
+:dotest
+sprintf2 delfilename '%s\%s.log' ipstr filestr
+filedelete delfilename
+sprintf2 logfilename '%s\%s\%s.log' mdir ipstr filestr
+logopen logfilename 0 0
+sprintf2 logstr 'Test %s' filestr
+logwrite logstr
+sprintf2 tcfile '..\%s\%s.ttl' ipstr filestr 
+include tcfile
+pause delay
+logclose
+call decision
+return
+
+:decision
+timeout=600
+fileopen fhandle logfilename 0
+if NeedReview == 1 then
+    resultstr=Reviewstr
+else
+    filestrseek fhandle chkstr
+    if result=0 then
+        resultstr=Failstr
+    else 
+        resultstr=Passstr
+    endif
+endif
+
+fileseek fhandle 0 0
+do
+    filereadln fhandle line
+    filewriteln frethnd line
+loop while result == 0
+filewriteln frethnd resultstr
+filewriteln frethnd 0
+filewriteln frethnd 0
+fileclose fhandle
+NeedReview=0
+resultstr=''
+pause 1
+
+return

@@ -1,0 +1,107 @@
+; A. Description
+;    A list of commands here configures timer1 and generates a periodic interrupt based on external clock source.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer1
+;    2. Timer2
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer11 : PA6/PA6 (Output/Capture Input)
+;               : PB6 (External Clock Input)
+;    2. Timer21 : PC1/PC1 (Output/Capture Input)
+;               : PC3 (External Clock Input)
+;
+; E. Port Connection
+;    1. PC1 (Timer21 Output) ----> PB6 (Timer11 External Clock Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer11
+; 1. Channel                   : 1 (Timer11)
+;
+; 2. Clock                     : [ 1 e f 0 ]
+;    Source                    : e (External Clock Input) 
+;    External Clock Input Edge : f (Falling) 
+;    Timer1 Pre-Divide         : 0 (No Pre-Divider available so default 0)
+;
+; 3. Config                    : [ 1 i p h 3000 3000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Periodic)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 3000
+;    B Data                    : 3000
+;
+; Timer21
+; 1. Channel                   : 1 (Timer21)
+;
+; 2. Clock                     : [ 1 p 4000 ]
+;    Source                    : p (PCLK : Peripheral Clock)
+;    Timer2 Pre-Divide         : 4000 (PCLK / 4000)
+;
+; 3. Config                    : [ 1 i p h 1 1 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 1
+;    B Data                    : 1
+;
+; PCU (PB6)
+; 1. Port Group                : 1 (PCU Port B)
+;
+; 2. Port                      : [ 1 6 a 2 ]
+;    Pin Number                : 6 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 (EC11)
+;
+; PCU (PC1)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 1 a 1 ]
+;    Pin Number                : 1 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (T21O)
+
+; PCU (PB6)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 6 a 2'
+mpause 30
+
+; PCU (PC1)
+sendln 'port 2 1 a 1'
+mpause 30
+
+; Timer21
+sendln 'cm timer2'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 p 4000'
+mpause 30
+sendln 'config 1 i p h 1 1'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 1'
+mpause 30
+
+; Timer11
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 e f 0'
+mpause 30
+sendln 'config 1 i p h 3000 3000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 1'

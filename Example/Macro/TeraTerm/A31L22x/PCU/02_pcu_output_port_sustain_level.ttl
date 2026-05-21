@@ -1,0 +1,66 @@
+; A. Description
+;    A list of commands here configures PCU module and sustains a output level of a target port.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;
+; D. Default Port
+;    1. PCU     : PA1 (Output)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; PCU (PA1)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 1 o p h ]
+;    Pin Number                : 1
+;    Pin Mode                  : o (Output)
+;    Pin Output Mode           : p (Push-Pull)
+;    Pin Level                 : h (High)
+;
+; 3. Output                    : [ 0 1 l / h -sustain e / d ]
+;    Pin Number                : 1
+;    Pin Level                 : l(Low) / h (High)
+;    Pin Sustain Enable        : e (Enable) / d (Disable)
+;
+; PCU (PA1)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 1 o p h'
+mpause 30
+sendln 'output 0 1 h -sustain e'
+mpause 30
+
+i = 10
+do while i > 0
+    i = i - 1
+    if i%2 = 0 then
+        sendln 'output 0 1 l'
+    else
+        sendln 'output 0 1 h'
+    endif
+    pause 1
+loop
+
+pause 1
+sendln 'output 0 1 l -sustain d'
+pause 1
+sendln 'output 0 1 h'
+pause 1
+sendln 'output 0 1 l'
+pause 1
+
+i = 10
+do while i > 0
+    i = i - 1
+    if i%2 = 0 then
+        sendln 'output 0 1 l'
+    else
+        sendln 'output 0 1 h'
+    endif
+    pause 1
+loop
+

@@ -1,0 +1,109 @@
+; A. Description
+;    A list of commands here configures timer3 and generates a capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer3
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer30 : PE0 (PWM AA Output)
+;               : PE1 (PWM AB Output)
+;               : PE2 (PWM BA Output)
+;               : PE3 (PWM BB Output)
+;               : PE4 (PWM CA Output)
+;               : PE5 (PWM CB Output)
+;               : PF7 (Capture Input)
+;               : PF6 (External Clock Input)
+;               : PF5 (BLANK Input)
+;    2. Timer16 : PB10/PB10 (Output/Capture Input)
+;               : PB8 (External Clock Input)
+;
+; E. Port Connection
+;    1. PB10 (Timer16 Output) ----> PF7 (Timer30 Capture Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer30
+; 1. Channel                   : 0 (Timer30)
+;
+; 2. Clock                     : [ 0 p 3999 ]
+;    Source                    : p (PCLK)
+;    Timer1 Pre-Divide         : 3999 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 0 i c b s 40000 10000 20000 30000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : c (Capture)
+;    Capture Edge              : b (Both Edge)
+;    Output Mode               : s (6-ch)
+;    Period                    : 40000
+;    A Data                    : 10000
+;    B Data                    : 20000
+;    C Data                    : 30000
+;
+; Timer16
+; 1. Channel                   : 6 (Timer16)
+;
+; 2. Clock                     : [ 6 p 0 3999 ]
+;    Source                    : p (PCLK)
+;    PCLK Divider              : 0 (No Divider available so default 0)
+;    Timer1 Pre-Divide         : 3999 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 6 i p h 10000 10000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 10000
+;    B Data                    : 10000
+;
+; PCU
+; 1. Port Group                : 1 (PCU Port B) / 5 (PCU Port F)
+;
+; 2. Port                      : [ 1 10 a 1 ] [ 5 7 a 2 ]
+;    Pin Number                : 10 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 10 (T16OUT) / 2 (T30CAP)
+;
+; PCU (PB10)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 10 a 1'
+mpause 30
+
+; PCU(PF7)
+sendln 'port 5 7 a 2'
+mpause 30
+
+; Timer16
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 6'
+mpause 30
+sendln 'init 6'
+mpause 30
+sendln 'clk 6 p 0 3999'
+mpause 30
+sendln 'config 6 i p h 10000 10000'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 6'
+mpause 30
+
+; Timer30 
+sendln 'cm timer3'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 3999'
+mpause 30
+sendln 'config 0 i c b s 40000 10000 20000 30000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

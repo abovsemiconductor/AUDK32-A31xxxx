@@ -1,0 +1,82 @@
+; A. Description
+;    A list of commands here configures PCU module and generates input interrupt via the signal from timer1.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;    2. Timer1
+;
+; D. Default Port
+;    1. PCU     : PB2 (Input)
+;    2. Timer10 : PE6/PE6 (Output/Capture Input)
+;               : PD7 (External Clock Input)
+;
+; E. Port Connection
+;    1. PE6 (Timer10 Output) ----> PB2 (Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; PCU (PB2)
+; 1. Port Group                   : 1 (PCU Port B)
+;
+; 2. Port                         : [ 1 2 i i -intr i e r ]
+;    Pin Number                   : 2
+;    Pin Mode                     : i (Input)
+;    Pin Input Mode               : i (Normal Input)
+;    Pin Operation Mode           : i (Interrupt)
+;    Pin Interrupt Mode           : e (Edge)
+;    Pin Interrupt Trigger Edge   : r (Rising)
+;
+; PCU (PE6)
+; 1. Port Group                   : 4 (PCU Port E)
+;
+; 2. Port                         : [ 4 7 a 1 ]
+;    Pin Number                   : 7
+;    Pin Mode                     : a (Alternative)
+;    Alternative                  : 1 (T11OUT)
+;
+; Timer11
+; 1. Channel                      : 1 (Timer11)
+;
+; 2. Clock                        : [ 1 p 0 3999 ]
+;    Source                       : p (PCLK)
+;    Source Divide                : 0 (Not available)
+;    Timer1 Pre-Divide            : 3999 (Pre-Divide + 1)
+;
+; 3. Config                       : [ 1 i p h 10000 10000 ]
+;    Operation                    : i (Interrupt)
+;    Mode                         : p (Period)
+;    Output Port Polarity         : h (High)
+;    A Data                       : 10000
+;    B Data                       : 10000
+;
+; PCU (PB2)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 2 i i -intr i e r'
+mpause 30
+
+; PCU (PE7)
+sendln 'port 4 7 a 1'
+mpause 30
+sendln 'port 4 6 a 0'
+mpause 30
+sendln 'port 3 7 a 0'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 p 0 3999'
+mpause 30
+sendln 'config 1 i p h 10000 10000'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 1'

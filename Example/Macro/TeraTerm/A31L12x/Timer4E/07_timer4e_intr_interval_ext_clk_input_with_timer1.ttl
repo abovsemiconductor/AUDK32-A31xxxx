@@ -1,0 +1,110 @@
+; A. Description
+;    A list of commands here configures timer3 and generates a periodic interrupt based on external clock source.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer4E
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer4E0 : PA0 (TIMER4E A Output)
+;                : PA1 (TIMER4E B Output)
+;                : PA0 (Capture Input)
+;                : PA1 (External Clock Input)
+;    2. Timer4E1 : PB3/PB4/PB3 (Output A/ B /Capture Input)
+;                : PB4 (External Clock Input)
+;
+; E. Port Connection
+;    1. PB4 (Timer4E1 Output) ----> PA1 (Timer4E0 External Clock Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer4E0
+; 1. Channel                   : 0 (Timer4E0)
+;
+; 2. Clock                     : [ 0 e f ]
+;    Source                    : e (External Input)
+;    Source Edge               : f (Falling Edge)
+;
+; 3. Config                    : [ 0 i i 32 16 16 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Period                    : 32 
+;    A Data                    : 16
+;    B Data                    : 16
+;
+; Timer4E1
+; 1. Channel                   : 1 (Timer4E1)
+;
+; 2. Clock                     : [ 1 p 4095 ]
+;    Source                    : p (PCLK)
+;    Timer4e Pre-Divide        : 4095 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 1 i i -port -pb en h 7812 3906 3906 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Port                      : -pb (Port B)
+;    Port Output Enable        : en (Enable)
+;    Port Output Start Level   : h (High)
+;    Period                    : 7814
+;    A Data                    : 3907
+;    B Data                    : 3907
+;
+; PCU (PB4)
+; 1. Port Group                : 1 (PCU Port B)
+;
+; 2. Port                      : [ 1 4 a 0 ]
+;    Pin Number                : 4 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (T4E1OUT)
+;
+; PCU (PA1)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 1 a 1 ]
+;    Pin Number                : 1 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (EC40)
+
+; PCU(PB4)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 4 a 0'
+mpause 30
+
+; PCU(PA1)
+sendln 'port 0 1 a 1'
+mpause 30
+
+; Timer4E0
+sendln 'cm timer4e'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 p 4095'
+mpause 30
+sendln 'config 1 i i -port -pb en h 7812 3906 3906'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 1'
+mpause 30
+
+;TIMER4E
+sendln 'cm timer4e'
+mpause 30
+sendln 'uninit 3'
+mpause 30
+sendln 'init 3'
+mpause 30
+sendln 'clk 3 e f'
+mpause 30
+sendln 'config 3 i i 10 5 5'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 3'

@@ -1,0 +1,123 @@
+; A. Description
+;    A list of commands here configures ADC and generates multiple capture interrupt through timer3 trigger source.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. ADC
+;    2. Timer3
+;
+; D. Default Port
+;    1. ADC0    : PA0 (AN0)
+;               : PA1 (AN1)
+;               : PA2 (AN2)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; ADC0
+; 1. Channel                   : 0
+;
+; 2. Clock                     : [ 0 m h 128 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 32MHz)
+;    MCCR Source Divide        : 128
+;
+; 3. Config                    : [ config 0 i m 3 8 0 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : m (Multiple)
+;    Base Trigger Source       : 3 (Timer3)
+;    Sequence Count            : 8
+;    Sampling Time             : 0
+;
+; 4. Seq                       : [ 0 3 0 0 0 ]
+;    Trigger Source            : 3 (Timer3)
+;    Trigger Source Number     : 0 (Timer30)
+;    Sequence Number           : 0
+;    Input Channel             : 0
+;
+; Timer30
+; 1. Channel                   : 0 (Timer30)
+;
+; 2. Clock                     : [ 0 m h 10 1000 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 32MHz)
+;    Source Divide             : 10
+;    Timer1 Pre-Divide         : 1000 (MCCR Clock / 10) / 1000
+;
+; 3. Config                    : [ 0 i i s 3200 800 1600 2400 ]
+;    Operation                 : Interrupt
+;    Mode                      : Period
+;    Output Port Polarity      : High Level
+;    Period Data               : 3200
+;    A Data                    : 800
+;    B Data                    : 1600
+;    C Data                    : 2400
+;
+; 4. Adctrg                    : [ 0 0x08 1 ]
+;    Adc Trigger Number        : 0x08 (ADC trigger signal by Period Match)
+;    Adc Trigger Delay         : 3 (Interrupt down count)
+;
+; Timer30
+sendln 'cm timer3'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i i s 3200 800 1200 2400'
+mpause 30
+sendln 'adctrg 0 0x08 1'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 128'
+mpause 30
+sendln 'config 0 i m 3 8 0'
+mpause 30
+sendln 'seq 0 3 0 0 0'
+mpause 30
+sendln 'seq 0 3 0 1 1'
+mpause 30
+sendln 'seq 0 3 0 2 2'
+mpause 30
+sendln 'seq 0 3 0 3 3'
+mpause 30
+sendln 'seq 0 3 0 4 4'
+mpause 30
+sendln 'seq 0 3 0 5 5'
+mpause 30
+sendln 'seq 0 3 0 6 6'
+mpause 30
+sendln 'seq 0 3 0 7 7'
+mpause 30
+
+; Timer30
+sendln 'cm timer3'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'start 0'
+pause 12
+sendln 'dump 0'
+pause 1
+sendln 'stop 0'
+mpause 30
+
+sendln 'cm timer3'
+mpause 30
+sendln 'stop 0'

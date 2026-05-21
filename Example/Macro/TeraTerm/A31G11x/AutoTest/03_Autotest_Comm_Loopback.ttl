@@ -1,0 +1,132 @@
+; A. Description
+;    This script automatically executes I2C Loopback Tera Term example scripts.
+;    The 02_Autotest_Comm_Rx.ttl must be executed before running this script.
+;
+; B. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;    2. I2C
+;
+; C. Port Connection
+;    1. I2C0/1
+;     : PD0 (Serial Clock)  <---->  PA1 (Serial Clock)
+;     : PD1 (Serial Data)   <---->  PA0 (Serial Data)
+;
+; D.Note 
+
+timeout=600
+Passstr='===== Test Result : Pass ====='#13#10
+Failstr='===== Test Result : Fail ====='#13#10
+Reviewstr='===== Test Result : Need Review ===='#13#10
+NeedReview=0
+Datastr='0xa5 0x5a 0xa5 0x5a 0x5 0x7 0x9 0xa0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0'
+MaxDatacnt=16
+Datacnt=1
+index=1
+Resultstr=''
+
+getdir mdir
+foldercreate 'Result'
+
+fileret='03_Autotest_Result_Comm_Loopback'
+sprintf2 retfilename '%s\Result\%s.txt' mdir fileret
+sprintf2 delfilename 'Result\%s.txt' fileret
+filedelete delfilename
+fileopen frethnd retfilename 0
+
+call tci2c
+
+fileclose frethnd
+dispstr 'End of 3. Auto Test Comm Loopback'
+end
+
+:tci2c
+;===== START : TestCase I2C Loopback =====
+dispstr 10 10
+dispstr '===== START : TestCase I2C Loopback ====='
+dispstr 10 
+
+ipstr='I2C'
+foldercreate ipstr
+
+filestr='05_i2c_master_slave_intr_tx_rx_sa_0x49'
+iprxstr='I2C : rx Data'
+Datastr='0xa5 0x5a 0xa5 0x5a 0x5 0x7 0x9 0xa0 0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0'
+MaxDatacnt=16
+Datacnt=1
+index=1
+delay=1
+call dotest
+
+;===== END : TestCase I2C Loopback =====
+dispstr 10
+dispstr '===== END : TestCase I2C Loopback ====='
+dispstr 10 
+return
+
+:dotest
+sprintf2 filename '%s\%s\%s.log' mdir ipstr filestr
+sprintf2 delfilename '%s\%s.log' ipstr filestr
+filedelete delfilename
+sprintf2 logstr 'Test %s' filestr
+sprintf2 testfile '..\%s\%s.ttl' ipstr filestr
+logopen filename 0 0
+logwrite logstr
+include testfile
+pause delay
+logclose
+call decision
+return
+
+:decision
+timeout=600
+fileopen fhandle filename 0
+call cmpdata
+fileseek fhandle 0 0
+do
+    filereadln fhandle line
+    filewriteln frethnd line
+loop while result == 0
+filewriteln frethnd resultstr
+filewriteln frethnd 0
+filewriteln frethnd 0
+fileclose fhandle
+NeedReview=0
+resultstr=''
+pause 1
+return
+
+:cmpdata
+fileseek fhandle 0 0
+sprintf2 parsestr '%s=([a-zA-Z0-9]+)' iprxstr
+while 1
+    filereadln fhandle line
+    if result = 1 then
+        break
+    endif
+    strmatch line parsestr
+    if result > 0 then
+        dstr = groupmatchstr1
+        strinsert Resultstr index dstr
+        strlen dstr
+        index = index + result
+        if Datacnt > MaxDataCnt - 1 then
+            break
+        endif
+        strinsert Resultstr index ' '
+        index = index + 1
+        Datacnt = Datacnt + 1
+    endif
+endwhile
+;dispstr "Result : "
+;dispstr Resultstr
+;dispstr 10
+;dispstr "Cmp : "
+;dispstr Datastr
+;dispstr 10
+strcompare Resultstr Datastr
+if result == 0 then
+    resultstr=Passstr
+else
+    resultstr=Failstr
+endif
+return

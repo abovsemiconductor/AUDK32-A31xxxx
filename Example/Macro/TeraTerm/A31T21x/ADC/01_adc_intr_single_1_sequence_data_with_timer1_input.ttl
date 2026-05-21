@@ -1,0 +1,116 @@
+; A. Description
+;    A list of commands here configures ADC and generates single capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. ADC
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. ADC0    : PA7 (AN8)
+;    1. Timer11 : PE0/PE0 (Output/Capture Input)
+;
+; E. Port Connection
+;    1. PA7 (AN8) <----> PE0 (Timer11 Output)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; ADC0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 p 63 ]
+;    Source                     : p (Periperhal Clock)
+;    Peripheral Clock Divide    : 63 (Divide + 1)
+;
+; 3. Config                     : [ config 0 i i ]
+;    Operation                  : i (Interrupt)
+;    Reference Level            : i (Internal VDD)
+;
+; 4. Seq                        : [ 0 a 8 ]
+;    Trigger Source             : a (ADC Instant Start)
+;    Input Channel              : 8
+;
+; Timer11
+; 1. Channel                    : 1 (Timer11)
+;
+; 2. Clock                      : [ 1 m h 4 64 ]
+;    Source                     : m (MCCR : Misc Clock)
+;    MCCR Source                : h (HSI : High Speed Internal Clock - 32MHz)
+;    Source Divide              : 4 
+;    Timer1 Pre-Divide          : 64 (MCCR Clock / 4) / 64
+;
+; 3. Config                     : [ 1 i p h 13 13 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : p (Period)
+;    Output Port Polarity       : h (High)
+;    A Data                     : 13
+;    B Data                     : 13
+;
+; PCU (PA7)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 7 a 4 ]
+;    Pin Number                : 7 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (AN8)
+;
+; PCU (PE0)
+; 1. Port Group                : 4 (PCU Port E)
+;
+; 2. Port                      : [ 4 0 a 1 ]
+;    Pin Number                : 0 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (T11O)
+;
+
+; PCU (PE0)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 4 0 a 1'
+mpause 30
+
+; PCU (PA7)
+sendln 'port 0 7 a 4'
+mpause 30
+
+; Timer11
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 m h 4 64'
+mpause 30
+sendln 'config 1 i p h 13 13'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 1'
+
+; ADC0
+mpause 30
+sendln 'cm adc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 63'
+mpause 30
+sendln 'config 0 i i'
+mpause 30
+sendln 'seq 0 a 8'
+mpause 30
+sendln 'start 0'
+pause 2 
+sendln 'dump 0'
+pause 3
+
+; Timer11
+sendln 'cm timer1'
+mpause 30
+sendln 'stop 1'

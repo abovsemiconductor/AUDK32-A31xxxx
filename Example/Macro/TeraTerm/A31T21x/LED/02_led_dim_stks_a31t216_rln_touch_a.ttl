@@ -1,0 +1,137 @@
+; A. Description
+;    A list of commands here configures LED module as ram mode and controls LED dimming on LED matrix.
+;
+; B. Preparation
+;    Connecting ports with LED Matrix should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. LED
+;    2. PCU/GPIO
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; - LED Matrix (Tested) : stks-a31t216_rln_touch_a
+;
+; 1. Channel                    : 0 (LED)
+;
+; 2. Clock                      : [ 0 m h 24 3 ]
+;    Source                     : MCCR (Misc Clock) / HSI (High Speed Internal Clock)
+;    Source Divide              : 24
+;    LED Pre-Divide             : 3
+;
+; 3. Config                     : [ 0 i r a 1 255 0 -overlap 8 ]
+;    Operation                  : i (Interrupt)
+;    Display Mode (RAM / Port)  : r (RAM)
+;    Mode                       : t (AUTO)
+;    Port Share Mode            : 1 (iseq0-iseq1)
+;    Pulse Width                : 255 ( Clock / (Width + 1) )
+;    Stop Duration              : 0
+;    Overlap                    : 8
+;
+; 4. Icom                       : [ 0 0 1 2 3 4 5 7 8 ]
+;    Icom Number                : 0 1 2 3 4 5 7 8
+;
+; 5. Iseg                       : [ 0 6 9 10 11 12 13 14 15 ]
+;    Iseg Number                : 6 9 10 11 12 13 14 15
+;
+; 6. Dim                        : [ 0 0 0 1 0 2 0 3 0 4 0 5 0 7 0 8 0 ]
+;    Icom Number / Dimming      : 0 0, 1 0, 2 0, 3 0, 4 0, 5 0, 7 0, 8 0
+;
+; 7. Data                       : [ 0 0 0x000 1 0x000 2 0x000 3 0x3c4 4 0x044 5 0x3c4 7 0x000 8 0x000 ]
+;    Icom Number / ISeg Data    : 0 0x000, ..., 8 0x000
+;     - ISeg Data (Bit Order)
+;
+; PCU (ICOM)
+; 1. Port Group                : 3 / 4 (PCU Port D / E)
+;
+; 2. Port                      : [ 3 5 a 5 ] [ 4 0 a 5 ] [ 4 2 a 5 ] [ 4 3 a 5 ] [ 4 4 a 5 ] [ 4 5 a 5 ] [ 4 6 a 5 ] [ 4 7 a 5 ]
+;    Pin Number                : 5 / 0 / 2 / 3 / 4 / 5 / 6 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 5 (ICOM8) / 5 (ICOM7) / 5 (ICOM5) / 5 (ICOM4) / 5 (ICOM3) / 5 (ICOM2) / 5 (ICOM1) / 5 (ICOM0)
+;
+; PCU (SEG)
+; 1. Port Group                : 2 / 3 / 4 (PCU Port C / D / E)
+;
+; 2. Port                      : [ 2 3 a 5 ] [ 2 4 a 5 ] [ 3 0 a 5 ] [ 3 1 a 5 ] [ 3 2 a 5 ] [ 3 3 a 5 ] [ 3 4 a 5 ] [ 4 1 a 5 ]
+;    Pin Number                : 3 / 4 / 0 / 1 / 2 / 3 / 4 / 1
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 5 (SEG15) / 5 (SEG14) / 5 (SEG13) / 5 (SEG12) / 5 (SEG11) / 5 (SEG10) / 5 (SEG9) / 5 (SEG6) 
+;
+; PCU
+sendln 'cm pcu'
+mpause 30
+
+; ICOM
+sendln 'port 3 5 a 5'
+mpause 30
+sendln 'port 4 0 a 5'
+mpause 30
+sendln 'port 4 2 a 5'
+mpause 30
+sendln 'port 4 3 a 5'
+mpause 30
+sendln 'port 4 4 a 5'
+mpause 30
+sendln 'port 4 5 a 5'
+mpause 30
+sendln 'port 4 6 a 5'
+mpause 30
+sendln 'port 4 7 a 5'
+mpause 30
+
+; SEG
+sendln 'port 2 3 a 5'
+mpause 30
+sendln 'port 2 4 a 5'
+mpause 30
+sendln 'port 3 0 a 5'
+mpause 30
+sendln 'port 3 1 a 5'
+mpause 30
+sendln 'port 3 2 a 5'
+mpause 30
+sendln 'port 3 3 a 5'
+mpause 30
+sendln 'port 3 4 a 5'
+mpause 30
+sendln 'port 4 1 a 5'
+mpause 30
+
+;LED
+sendln 'cm led'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 24 3'
+mpause 30
+sendln 'config 0 i r a 1 255 0 -overlap 8'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'icom 0 0 1 2 3 4 5 7 8'
+mpause 30
+sendln 'iseg 0 6 9 10 11 12 13 14 15'
+mpause 30
+sendln 'dim 0 0 0 1 0 2 0 3 0 4 0 5 0 7 0 8 0'
+mpause 30
+sendln 'data 0 0 0xFFF0 1 0xFFF0 2 0xFFF0 3 0xFFF0 4 0xFFF0 5 0xFFF0 7 0xFFFF 8 0xFFF0'
+mpause 30
+sendln 'start 0 10000'
+mpause 30
+sendln 'dim 0 0 1 1 1 2 1 3 1 4 1 5 1 7 1 8 1'
+pause 1
+sendln 'dim 0 0 50 1 50 2 50 3 50 4 50 5 50 7 50 8 50'
+pause 1
+sendln 'dim 0 0 100 1 100 2 100 3 100 4 100 5 100 7 100 8 100'
+pause 1
+sendln 'dim 0 0 150 1 150 2 150 3 150 4 150 5 150 7 150 8 150'
+pause 1
+sendln 'dim 0 0 200 1 200 2 200 3 200 4 200 5 200 7 200 8 200'
+pause 1
+sendln 'dim 0 0 255 1 255 2 255 3 255 4 255 5 255 7 255 8 255'
+pause 1
+sendln 'dim 0 0 0 1 0 2 0 3 0 4 0 5 0 7 0 8 0'
+pause 5
+sendln 'stop 0'

@@ -1,0 +1,139 @@
+; A. Description
+;    A list of commands here configures LED module as ram mode and controls LED dimming on LED matrix.
+;
+; B. Preparation
+;    Connecting ports with LED Matrix should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. LED
+;    2. PCU/GPIO
+;
+; D. Note
+;    Should use UART1 as a debug log port at stks-a31g314_mmn_touch_a board.
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; - LED Matrix (Tested) : stks-a31g314_mmn_touch_a
+;
+; 1. Channel                    : 0 (LED)
+;
+; 2. Clock                      : [ 0 m h 24 3 ]
+;    Source                     : MCCR (Misc Clock) / HSI (High Speed Internal Clock)
+;    Source Divide              : 24
+;    LED Pre-Divide             : 3
+;
+; 3. Config                     : [ 0 i r a 1 255 0 -overlap 8 ]
+;    Operation                  : i (Interrupt)
+;    Display Mode (RAM / Port)  : r (RAM)
+;    Mode                       : a (Alone)
+;    Port Share Mode            : 1 (iseq0-iseq1)
+;    Pulse Width                : 255 ( Clock / (Width + 1) )
+;    Stop Duration              : 0
+;    Overlap                    : 8
+;
+; 4. Icom                       : [ 0 6 7 12 13 15 16 17 18 24 ]
+;    Icom Number                : 6, 7, 12, 13, 15, 16, 17, 18, 24
+;
+; 5. Iseg                       : [ 0 2 4 5 6 7 8 9 ]
+;    Iseg Number                : 2, 4, 5, 6, 7, 8, 9
+;
+; 6. Dim                        : [ 0 7 0 6 0 12 0 13 0 15 0 16 0 17 0 18 0 24 0 ]
+;    Icom Number / Dimming      : 7 0, 6 0, 12 0, 13 0, 15 0, 16 0, 17 0, 18 0, 24 0
+;
+; 7. Data                       : [ 0 7 0x3F4 6 0x3F4 12 0x3F4 13 0x3F4 15 0x3F4 16 0x3F4 17 0x3F4 18 0x3F4 24 0x3F4 ]
+;    Icom Number / ISeg Data    : 7 0x3F4, ..., 24 0x3F4
+;     - ISeg Data (Bit Order)
+;
+; PCU (ICOM)
+; 1. Port Group                : 3 / 4 (PCU Port B / C / D / E)
+;
+; 2. Port                      : [ 1 2 a 4 ] [ 2 0 a 4 ] [ 2 1 a 4 ] [ 2 2 a 4 ] [ 2 3 a 4 ] [ 3 0 a 4 ] [ 3 1 a 4 ] [ 4 6 a 4 ] [ 4 7 a 4 ]
+;    Pin Number                : 2 / 0 / 1 / 2 / 3 / 0 / 1 / 6 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (ICOM24) / 4 (ICOM18) / 4 (ICOM17) / 4 (ICOM16) / 4 (ICOM15) / 4 (ICOM13) / 4 (ICOM12) / 4 (ICOM7) / 4 (ICOM6)
+;
+; PCU (SEG)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 0 a 4 ] [ 0 1 a 4 ] [ 0 2 a 4 ] [ 0 3 a 4 ] [ 0 4 a 4 ] [ 0 5 a 4 ] [ 0 7 a 4 ]
+;    Pin Number                : 0 / 1 / 2 / 3 / 4 / 5 / 7
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (ISEG9) / 4 (ISEG8) / 4 (ISEG7) / 4 (ISEG6) / 4 (ISEG5) / 4 (ISEG4) / 4 (ISEG2) 
+;
+; PCU
+sendln 'cm pcu'
+mpause 30
+
+; ICOM
+sendln 'port 1 2 a 4'
+mpause 30
+sendln 'port 2 0 a 4'
+mpause 30
+sendln 'port 2 1 a 4'
+mpause 30
+sendln 'port 2 2 a 4'
+mpause 30
+sendln 'port 2 3 a 4'
+mpause 30
+sendln 'port 3 0 a 4'
+mpause 30
+sendln 'port 3 1 a 4'
+mpause 30
+sendln 'port 4 6 a 4'
+mpause 30
+sendln 'port 4 7 a 4'
+mpause 30
+
+; SEG
+sendln 'port 0 0 a 4'
+mpause 30
+sendln 'port 0 1 a 4'
+mpause 30
+sendln 'port 0 2 a 4'
+mpause 30
+sendln 'port 0 3 a 4'
+mpause 30
+sendln 'port 0 4 a 4'
+mpause 30
+sendln 'port 0 5 a 4'
+mpause 30
+sendln 'port 0 7 a 4'
+mpause 30
+
+sendln 'cm led'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 24 3'
+mpause 30
+sendln 'config 0 i r a 1 255 0 -overlap 8'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'icom 0 6 7 12 13 15 16 17 18 24'
+mpause 30
+sendln 'iseg 0 2 4 5 6 7 8 9'
+mpause 30
+sendln 'dim 0 7 0 6 0 12 0 13 0 15 0 16 0 17 0 18 0 24 0'
+mpause 30
+sendln 'data 0 7 0x3F4 6 0x3F4 12 0x3F4 13 0x3F4 15 0x3F4 16 0x3F4 17 0x3F4 18 0x3F4 24 0x3F4'
+mpause 30
+sendln 'start 0 10000'
+mpause 30
+sendln 'dim 0 7 1 6 1 12 1 13 1 15 1 16 1 17 1 18 1 24 1'
+pause 1
+sendln 'dim 0 7 50 6 50 12 50 13 50 15 50 16 50 17 50 18 50 24 50'
+pause 1
+sendln 'dim 0 7 100 6 100 12 100 13 100 15 100 16 100 17 100 18 100 24 100'
+pause 1
+sendln 'dim 0 7 150 6 150 12 150 13 150 15 150 16 150 17 150 18 150 24 150'
+pause 1
+sendln 'dim 0 7 200 6 200 12 200 13 200 15 200 16 200 17 200 18 200 24 200'
+pause 1
+sendln 'dim 0 7 255 6 255 12 255 13 255 15 255 16 255 17 255 18 255 24 255'
+pause 1
+sendln 'dim 0 7 0 6 0 12 0 13 0 15 0 16 0 17 0 18 0 24 0'
+pause 5
+sendln 'stop 0'

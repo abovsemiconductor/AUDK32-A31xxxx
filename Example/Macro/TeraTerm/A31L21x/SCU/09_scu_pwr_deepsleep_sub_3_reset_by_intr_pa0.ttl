@@ -1,0 +1,26 @@
+; A. Description
+;    A list of commands here configures SCU PWR and enters deep-sleep sub mode 3.
+;    And it do reset a target device from PA0 by external rising edge signal.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. SCUPWR
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; SCUPWR
+; 1. PWR                        : [ d h 0 h 0 3 0x1]
+;    Power Mode                 : d (Deep Sleep 1)
+;    Sleep Clock Source         : h (HSI)
+;    Sleep Clock Source Divide  : 0
+;    Wakeup Clock Source        : h (HSI)
+;    Wakeup Clock Source Divide : 0
+;    Deep Sleep Mode            : 3 (sub mode 3)
+;    Wake-up Pin                : 0x1 (PA0)
+;
+; SCUPWR
+sendln 'cm scupwr'
+mpause 30
+sendln 'pwr d h 0 h 0 3 0x1'

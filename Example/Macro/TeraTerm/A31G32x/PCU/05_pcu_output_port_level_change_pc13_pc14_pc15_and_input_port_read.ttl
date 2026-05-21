@@ -1,0 +1,99 @@
+; A. Description
+;    A list of commands here configures PCU module and controls a output level of a target port.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;
+; D. Default Port
+;    1. PCU     : PC13 (Output)
+;               : PC14 (Output)
+;               : PC15 (Output)
+;               : PC0 (Input)
+;               : PC2 (Input)
+;               : PC9 (Input)
+;
+; E. Port Connection
+;    1. PC13 (Output) ----> PC0 (Input)
+;       PC14 (Output) ----> PC2 (Input)
+;       PC15 (Output) ----> PC9 (Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; PCU (PCx)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 13 o p h ] [ 2 14 o p h ] [ 2 15 o p h ]
+;    Pin Number                : 13 / 14 / 15
+;    Pin Mode                  : o (Output)
+;    Pin Output Mode           : p (Push-Pull) 
+;    Pin Level                 : h (High)
+;
+; 3. Output                    : [ 2 13 l / h ] [ 2 14 l / h ] [ 2 15 l / h ]
+;    Pin Number                : 13 / 14 / 15
+;    Pin Level                 : l (Low) / h (High)
+;
+; PCU (PCx)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 0 i i ] [ 2 2 i i ] [ 2 9 i i ]
+;    Pin Number                : 0 / 2 / 8
+;    Pin Mode                  : i (input)
+;    Pin Output Mode           : i (input)
+;
+; 3. Input                     : [ 2 0 i i ] [ 2 2 i i ] [ 2 9 i i ]
+;    Pin Number                : 0 / 2 / 8
+;
+; PCU (PC13)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 2 13 o p h'
+mpause 30
+
+; PCU (PC14)
+sendln 'port 2 14 o p h'
+mpause 30
+
+; PCU (PC15)
+sendln 'port 2 15 o p h'
+mpause 30
+
+; PCU (PC0)
+sendln 'port 2 0 i i'
+mpause 30
+
+; PCU (PC2)
+sendln 'port 2 2 i i'
+mpause 30
+
+; PCU (PC9)
+sendln 'port 2 9 i i'
+mpause 30
+
+i = 30 
+do while i > 0
+    i = i - 1
+    if i%2 = 0 then
+        sendln 'output 2 13 l'
+        mpause 30
+        sendln 'output 2 14 h'
+        mpause 30
+        sendln 'output 2 15 l'
+        mpause 30
+    else
+        sendln 'output 2 13 h'
+        mpause 30
+        sendln 'output 2 14 l'
+        mpause 30
+        sendln 'output 2 15 h'
+        mpause 30
+    endif
+    sendln 'input 2 0'
+    mpause 30
+    sendln 'input 2 2'
+    mpause 30
+    sendln 'input 2 9'
+    pause 2
+loop

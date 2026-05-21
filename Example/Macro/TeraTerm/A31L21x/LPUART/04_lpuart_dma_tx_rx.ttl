@@ -1,0 +1,121 @@
+; A. Description
+;    A list of commands here configures LPUART and transmits/receives data.
+;
+; B. Preparation
+;    Connecting ports with a suitable instrument should be correct
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. LPUART
+;    2. UART
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. LPUART0 : PA8 (Transmit)
+;               : PA9 (Receive)
+;    2. LPUART1 : PB3 (Transmit)
+;               : PB4 (Receive)
+;
+; E. Port Connection
+;    1. PA8 (Transmit) <----> PB4 (Receive)
+;    2. PA9 (Receive)  <----> PB3 (Transmit)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; LPUART0
+; 1. Channel                   : 0 (LPUART0)
+;
+; 2. CLK                       : [ 0 m h 0 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 32MHz)
+;    Source Divide             : 0 (Not available)
+;
+; 3. Config                    : [ 0 d 8 o 1 38400 ]
+;    Operation                 : d (Interrupt DMA)
+;    Data Bit                  : 8 (8bit)
+;    Parity                    : o (odd)
+;    Stop Bit                  : 1 (1bit)
+;    Baudrate                  : 38400 bps
+;
+; 4. Rx                        : [ 0 8 ]
+;    Receive Data Length       : 8
+;
+; LPUART1
+; 1. Channel                   : 1 (LPUART1)
+;
+; 2. CLK                       : [ 1 m h 0 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 32MHz)
+;    Source Divide             : 0 (Not available)
+;
+; 3. Config                    : [ 1 d 8 o 1 38400 ]
+;    Operation                 : d (Interrupt DMA)
+;    Data Bit                  : 8 (8bit)
+;    Parity                    : o (odd)
+;    Stop Bit                  : 1 (1bit)
+;    Baudrate                  : 38400 bps
+;
+; 4. Data                      : [ 1 8 0xa5 0x5a 0xa5 0x5a 0x05 0x07 0x09 0xa0 ]
+;    Data Length               : 8
+;    Data                      : 0xa5 ... (Hexa and space (delimitor))
+;
+; 5. Tx                        : [ 1 8 ]
+;    Receive Data Length       : 8
+;
+; PCU (PAx)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 8 a 2 -pupd p ] [ 1 9 a 2 -pupd p ]
+;    Pin Number                : 8 / 9 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 (TX/RX)
+;    Pull-up/down              : p (Pull-up)
+;
+; PCU (PBx)
+; 1. Port Group                : 1 (PCU Port B)
+;
+; 2. Port                      : [ 1 3 a 2 -pupd p ] [ 1 4 a 2 -pupd p ]
+;    Pin Number                : 3 / 4 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 (TX/RX)
+;    Pull-up/down              : p (Pull-up)
+;
+; PCU (PAx)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 8 a 2 -pupd p'
+mpause 30
+sendln 'port 0 9 a 2 -pupd p'
+mpause 30
+
+; PCU (PBx)
+sendln 'port 1 3 a 2 -pupd p'
+mpause 30
+sendln 'port 1 4 a 2 -pupd p'
+mpause 30
+
+; LPUART0
+sendln 'cm lpuart'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 0'
+mpause 30
+sendln 'config 0 d 8 o 1 38400'
+mpause 30
+sendln 'rx 0 8'
+mpause 100
+
+; LPUART1
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 m h 0'
+mpause 30
+sendln 'config 1 d 8 o 1 38400'
+mpause 30
+sendln 'data 1 8 0xa5 0x5a 0xa5 0x5a 0x05 0x07 0x09 0xa0'
+mpause 30
+sendln 'tx 1 8'

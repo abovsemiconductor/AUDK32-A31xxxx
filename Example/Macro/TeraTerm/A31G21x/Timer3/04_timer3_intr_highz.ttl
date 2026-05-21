@@ -1,0 +1,127 @@
+; A. Description
+;    A list of commands here configures timer3 and generates a high-z and a interval interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer3
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer30 : PE0 (PWM AA Output)
+;               : PE1 (PWM AB Output)
+;               : PE2 (PWM BA Output)
+;               : PE3 (PWM BB Output)
+;               : PE4 (PWM CA Output)
+;               : PE5 (PWM CB Output)
+;               : PF3 (Capture Input)
+;               : PF2 (External Clock Input)
+;               : PF5 (BLANK Input)
+;    2. Timer12 : PA5/PA5 (Output/Capture Input)
+;               : PA2 (External Clock Input)
+;
+; E. Port Connection
+;    1. PA5 (Timer12 Output) ----> PF5 (Timer30 BLANK Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer30
+; 1. Channel                   : 0 (Timer30)
+;
+; 2. Clock                     : [ 0 m h 10 1000 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 32MHz)
+;    Source Divide             : 10 
+;    Timer3 Pre-Divide         : 1000 (MCCR Clock / 10) / 1000
+;
+; 3. Config                    : [ 0 i i s -hiz r e m 12800 3200 6400 9600 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Capture Edge              : b (Both Edge)
+;    Output Mode               : s (6-ch)
+;    High-Z Edge               : r (Rising)
+;    High-Z Source             : e (External Blank)
+;    High-Z Interrupt Mode     : m (Maskable)
+;    Period                    : 12800
+;    A Data                    : 3200
+;    B Data                    : 6400
+;    C Data                    : 9600
+;
+; Timer12 
+; 1. Channel                   : 2 (Timer12)
+;
+; 2. Clock                     : [ 2 m h 10 1000 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : h (HSI : High Speed Internal Clock - 32MHz)
+;    Source Divide             : 10 
+;    Timer2 Pre-Divide         : 1000 (MCCR Clock / 10) / 1000
+;
+; 3. Config                    : [ 2 i p h 3200 3200 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 3200
+;    B Data                    : 3200
+;
+; PCU (PF5)
+; 1. Port Group                : 5 (PCU Port F)
+;
+; 2. Port                      : [ 5 5 a 1 ]
+;    Pin Number                : 5 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (BLNK)
+;
+; PCU (PA5)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 5 a 1 ]
+;    Pin Number                : 5 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (T12O)
+
+; PCU (PF5)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 5 5 a 1'
+mpause 30
+sendln 'port 5 3 a 0'
+mpause 30
+sendln 'port 5 2 a 0'
+mpause 30
+
+; PCU (PA5)
+sendln 'port 0 5 a 1'
+mpause 30
+
+; Timer12
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 2'
+mpause 30
+sendln 'init 2'
+mpause 30
+sendln 'clk 2 m h 10 1000'
+mpause 30
+sendln 'config 2 i p h 3200 3200'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 2'
+mpause 30
+
+; Timer30 
+sendln 'cm timer3'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i i s -hiz r e m 12800 3200 6400 9600'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

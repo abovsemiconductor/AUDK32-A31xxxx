@@ -1,0 +1,510 @@
+; A. Description
+;    This script automatically executes WDT, WT, CRC, CFMC, some of Timer1, some of Timer2, some of Timer3, ADC, some of PCU, and SCU Tera Term example scripts.
+;
+; B. Prerequisite Example (abov_example_config.h)
+;    1. PCU/GPIO
+;    2. CRC
+;    3. RTC
+;    4. TempSens
+;
+; C. Port Connection
+;
+; D.Note 
+;    1. Should change a value of CONFIG_IRQ_28 to 1 /* 0 : Timer6, 1 : RTC */ at config_a31l22x.h.
+
+timeout=3000
+Passstr='===== Test Result : Pass ====='#13#10
+Failstr='===== Test Result : Fail ====='#13#10
+Reviewstr='===== Test Result : Need Review ===='#13#10
+NeedReview=0
+
+getdir mdir
+foldercreate 'Result'
+
+fileret='05_Autotest_Result_CRC_RTC_TEMPSENS'
+sprintf2 retfilename '%s\Result\%s.txt' mdir fileret
+sprintf2 delfilename 'Result\%s.txt' fileret
+filedelete delfilename
+fileopen frethnd retfilename 0
+
+call tccrc
+call tctempsens
+call tcrtc
+
+fileclose frethnd
+dispstr 'End of 5. Auto Test CRC/RTC/TempSens'
+end
+
+:tcwdt
+; ===== START : TestCase WDT =====
+dispstr 10 10
+dispstr '===== START : TestCase WDT ====='
+dispstr 10
+
+ipstr='WDT'
+foldercreate ipstr
+
+filestr='01_wdt_intr_maskable_match'
+chkstr='WDT : (0) M evt fired'
+delay=5
+call dotest
+
+filestr='03_wdt_intr_reset'
+chkstr='= Executable module list ='
+delay=12
+call dotest
+
+filestr='04_wdt_intr_underflow'
+chkstr='WDT : (0) U evt fired'
+delay=5
+call dotest
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase WDT =====
+dispstr 10
+dispstr '===== END : TestCase WDT ====='
+dispstr 10
+return
+
+:tccrc
+; ===== START : TestCase CRC =====
+dispstr 10 10
+dispstr '===== START : TestCase CRC ====='
+dispstr 10
+
+ipstr='CRC'
+foldercreate ipstr
+
+filestr='01_crc_poll_poly_8'
+chkstr='0x8f'
+delay=1
+call dotest
+
+filestr='02_crc_poll_poly_16'
+chkstr='0x826e'
+delay=1
+call dotest
+
+filestr='03_crc_poll_poly_16_ccitt'
+chkstr='0x7969'
+delay=1
+call dotest
+
+filestr='04_crc_poll_poly_32'
+chkstr='0xccdcd51e'
+delay=1
+call dotest
+
+filestr='05_checksum_poll'
+chkstr='0x165'
+delay=1
+call dotest
+
+filestr='06_crc_poll_poly_32_8bit'
+chkstr='0xccdcd51e'
+delay=1
+call dotest
+
+filestr='07_crc_poll_poly_32_16bit'
+chkstr='0xccdcd51e'
+delay=1
+call dotest
+
+filestr='08_crc_poll_poly_32_complement'
+chkstr='0xccdcd51e'
+delay=1
+call dotest
+
+; ===== END : TestCase CRC =====
+dispstr 10
+dispstr '===== END : TestCase CRC ====='
+dispstr 10
+return
+
+:tctempsens
+; ===== START : TestCase TEMP SENSOR =====
+dispstr 10 10
+dispstr '===== START : TestCase TEMP SENSOR ====='
+dispstr 10
+
+ipstr='TempSens'
+foldercreate ipstr
+
+filestr='01_tempsens_intr_sensor_clock_count_temperature'
+chkstr=''
+delay=5
+NeedReview=1
+call dotest
+
+; ===== END : TestCase TEMP SENSOR =====
+dispstr 10
+dispstr '===== END : TestCase TEMP SENSOR ====='
+dispstr 10
+return
+
+:tcrtc
+; ===== START : TestCase RTC =====
+dispstr 10 10
+dispstr '===== START : TestCase RTC ====='
+dispstr 10
+
+ipstr='RTC'
+foldercreate ipstr
+
+filestr='01_rtc_clock_period_1sec_12h'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+NeedReview=0
+sendln 'stop 0'
+pause 1
+
+filestr='02_rtc_clock_period_1sec_24h'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+NeedReview=0
+sendln 'stop 0'
+pause 1
+
+filestr='03_rtc_alarm'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+NeedReview=0
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase RTC =====
+dispstr 10
+dispstr '===== END : TestCase RTC ====='
+dispstr 10
+return
+
+:tccfmc
+; ===== START : TestCase CFMC =====
+dispstr 10 10
+dispstr '===== START : TestCase CFMC ====='
+dispstr 10
+
+ipstr='CFMC'
+foldercreate ipstr
+
+filestr='01_code_flash'
+chkstr='End of Flash'
+delay=1
+NeedReview=1
+call dotest
+NeedReview=0
+
+; ===== END : TestCase CFMC =====
+dispstr 10
+dispstr '===== END : TestCase CFMC ====='
+dispstr 10
+return
+
+:tcpcu
+; ===== START : TestCase PCU =====
+dispstr 10 10
+dispstr '===== START : TestCase PCU ====='
+dispstr 10
+
+ipstr='PCU'
+foldercreate ipstr
+
+filestr='03_pcu_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+filestr='04_pcu_input_port_intr_with_timer1'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='05_pcu_output_port_level_change_and_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='06_pcu_output_port_sustain_level_and_input_port_read'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+ipstr='PCU'
+filestr='07_pcu_input_port_intr_with_output_port'
+delay=0
+NeedReview=1
+call dotest
+NeedReview=0
+
+; ===== END : TestCase PCU =====
+dispstr 10
+dispstr '===== END : TestCase PCU ====='
+dispstr 10
+return
+
+:tcscu
+; ===== START : TestCase SCU =====
+dispstr 10 10
+dispstr '===== START : TestCase SCU ====='
+dispstr 10
+
+ipstr='SCU'
+foldercreate ipstr
+
+filestr='06_scu_reset'
+chkstr='= Executable module list ='
+delay=3
+call dotest
+
+; ===== END : TestCase SCU =====
+dispstr 10
+dispstr '===== END : TestCase SCU ====='
+dispstr 10
+return
+
+:tctimer4E
+; ===== START : TestCase Timer4E =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer4E ====='
+dispstr 10
+
+ipstr='Timer4E'
+foldercreate ipstr
+
+filestr='01_timer4e_intr_interval'
+chkstr='TIMER4E : (0) P evt fire'
+delay=6
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer4e_intr_back2back'
+chkstr='TIMER4E : (0) B evt fire'
+delay=10
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='04_timer4e_intr_interval_port_out'
+chkstr='TIMER4E : (0) P evt fire'
+delay=10
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='05_timer4e_intr_interval_delay'
+chkstr='TIMER4E : (0) P evt fire'
+delay=10
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='06_timer4e_intr_interval_update'
+chkstr='TIMER4E : (0) P evt fire'
+delay=10
+call dotest
+sendln 'stop 0'
+pause 1
+
+:tctimer5
+; ===== START : TestCase Timer5 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer5 ====='
+dispstr 10
+
+ipstr='Timer5'
+foldercreate ipstr
+
+filestr='01_timer5_intr_period'
+chkstr='TIMER5 : (0) P evt fire'
+delay=2
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_timer5_intr_oneshot'
+chkstr='TIMER5 : (0) P evt fire'
+delay=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='03_timer5_intr_pwm'
+chkstr='TIMER5 : (0) PWM P evt fire'
+delay=3
+call dotest
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase Timer5 =====
+dispstr 10
+dispstr '===== END : TestCase Timer5 ====='
+dispstr 10
+return
+
+:tctimer6
+; ===== START : TestCase Timer6 =====
+dispstr 10 10
+dispstr '===== START : TestCase Timer6 ====='
+dispstr 10
+
+ipstr='Timer6'
+foldercreate ipstr
+
+filestr='01_timer6_intr_event'
+chkstr='TIMER6 : (0) P evt fire'
+delay=6
+call dotest
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase Timer6 =====
+dispstr 10
+dispstr '===== END : TestCase Timer6 ====='
+dispstr 10
+return
+
+:tcadc
+; ===== START : TestCase ADC =====
+dispstr 10 10
+dispstr '===== START : TestCase ADC ====='
+dispstr 10
+
+ipstr='ADC'
+foldercreate ipstr
+
+filestr='01_adc_intr_single_1_sequence_data_with_timer1_input'
+chkstr=''
+delay=1
+NeedReview=1
+call dotest
+sendln 'stop 0'
+pause 1
+
+filestr='02_adc_intr_sequence_data_with_timer1_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+mpause 30
+sendln 'cm timer4'
+mpause 30
+sendln 'stop 0'
+pause 1
+
+filestr='03_adc_intr_continuous_data_with_timer1_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+mpause 30
+sendln 'cm timer4'
+mpause 30
+sendln 'stop 0'
+pause 1
+
+filestr='04_adc_intr_single_data_trigger_timer4E0_with_timer1_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+mpause 30
+sendln 'cm timer4'
+mpause 30
+sendln 'stop 0'
+pause 1
+
+filestr='05_adc_intr_single_data_ovs_trigger_timer4E0_with_timer1_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+mpause 30
+sendln 'cm timer4'
+mpause 30
+sendln 'stop 0'
+pause 1
+
+filestr='06_adc_intr_sequence_data_sampling_with_timer1_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+mpause 30
+sendln 'cm timer4'
+mpause 30
+sendln 'stop 0'
+pause 1
+
+filestr='07_adc_dma_single_1_sequence_data_with_timer1_input'
+chkstr=''
+delay=10
+NeedReview=1
+call dotest
+mpause 30
+sendln 'cm timer4'
+mpause 30
+sendln 'stop 0'
+pause 1
+
+; ===== END : TestCase ADC =====
+dispstr 10
+dispstr '===== END : TestCase ADC ====='
+dispstr 10
+return
+
+:dotest
+sprintf2 delfilename '%s\%s.log' ipstr filestr
+filedelete delfilename
+sprintf2 logfilename '%s\%s\%s.log' mdir ipstr filestr
+logopen logfilename 0 0
+sprintf2 logstr 'Test %s%s%s' filestr #13 #10
+logwrite logstr
+sprintf2 tcfile '..\%s\%s.ttl' ipstr filestr 
+include tcfile
+pause delay
+logclose
+call decision
+return
+
+:decision
+timeout=3000
+fileopen fhandle logfilename 0
+if NeedReview == 1 then
+    resultstr=Reviewstr
+else
+    filestrseek fhandle chkstr
+    if result=0 then
+        resultstr=Failstr
+    else 
+        resultstr=Passstr
+    endif
+endif
+
+fileseek fhandle 0 0
+do
+    filereadln fhandle line
+    filewriteln frethnd line
+loop while result == 0
+filewriteln frethnd resultstr
+filewriteln frethnd 0
+filewriteln frethnd 0
+fileclose fhandle
+NeedReview=0
+resultstr=''
+pause 1
+
+return

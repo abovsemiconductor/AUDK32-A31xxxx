@@ -1,0 +1,109 @@
+; A. Description
+;    A list of commands here configures ADC and generates single capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. ADC
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. ADC0    : PB0 (AN8)
+;    2. Timer13 : PB1/PB1 (Output/Capture Input)
+;
+; E. Port Connection
+;    1. PB1 (Timer13 Output) ----> PB0 (AN8)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; ADC0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 p 15 ]
+;    Source                     : p (PCLK)
+;    Divide                     : 15
+;
+; 3. Config                     : [ 0 i q 0 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : q (Sequence)
+;    Sampling Time              : 0
+;
+; 4. Seq                        : [ 0 a 0x10 ]
+;    Trigger Source             : a (ADC Instant Start)
+;    Input Channel              : 0x10
+;
+; Timer13
+; 1. Channel                    : 3 (Timer10)
+;
+; 2. Clock                      : [ 3 p 0 4095 ]
+;    Source                     : p (PCLK)
+;    Source Divide              : 0 (Not Available) 
+;    Timer1 Pre-Divide          : 4095 (PLCK) / 4095
+;
+; 3. Config                     : [ 3 i p h 7814 7814 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : p (Period)
+;    Output Port Polarity       : h (High)
+;    A Data                     : 7814
+;    B Data                     : 7814
+;
+; PCU (PBx)
+; 1. Port Group                : 1 (PCU Port B)
+;
+; 2. Port                      : [ 1 1 a 0 ] [ 1 0 a 5 ]
+;    Pin Number                : 1 / 0
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 / 5 (T13OUT/AN8)
+;
+
+; PCU (PB1)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 1 a 0'
+mpause 30
+
+; PCU (PB0)
+sendln 'port 1 0 a 5'
+mpause 30
+
+; Timer13
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 3'
+mpause 30
+sendln 'init 3'
+mpause 30
+sendln 'clk 3 p 0 4095'
+mpause 30
+sendln 'config 3 i p h 7814 7814' 
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 3'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 15'
+mpause 30
+sendln 'config 0 i q 0'
+mpause 30
+sendln 'seq 0 a 0x100'
+mpause 30
+sendln 'start 0'
+pause 2
+sendln 'dump 0'
+pause 1
+sendln 'stop 0'
+mpause 30
+
+sendln 'cm timer1'
+mpause 30
+sendln 'stop 3'

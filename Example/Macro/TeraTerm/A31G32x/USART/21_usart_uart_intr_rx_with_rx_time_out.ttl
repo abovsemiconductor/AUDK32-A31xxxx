@@ -1,0 +1,51 @@
+; A. Description
+;    A list of commands here configures USART as UART and generates receive time-out interrupt.
+;
+; B. Preparation
+;    Connecting ports with a suitable instrument should be correct
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. USART
+;
+; D. Default Port
+;    1. USART1  : PA2 (Transmit)
+;               : PA3 (Receive)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; USART1
+; 1. Channel                   : 1 (USART1)
+;
+; 2. Config                    : [ 1 i u 8 n 1 n 38400 -rto e 65535 ]
+;    Operation                 : i (Interrupt)
+;    USART Mode                : u (UART)
+;    Data Bit                  : 8 (8bit)
+;    Parity                    : n (None)
+;    Stop Bit                  : 1 (1bit)
+;    Speed Mode                : n (Normal)
+;    Baudrate                  : 38400 bps
+;    Receive Time Out Enable   : e (enable)
+;    Receive Time Out Count    : 65535
+;
+; 3. Rx                        : [ 1 8 ]
+;    Force Operation           : i (Interrupt)
+;    Receive Data Length       : 8
+;
+; USART1
+sendln 'cm usart'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'config 1 i u 8 n 1 n 38400 -rto e 65535'
+mpause 30
+
+i = 10
+do while i>0
+    i = i - 1
+    sendln 'rx 1 8'
+    pause 3
+    sendln 'abort 1 r'
+    mpause 30
+loop

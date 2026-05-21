@@ -1,0 +1,115 @@
+; A. Description
+;    A list of commands here configures ADC and generates single capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. ADC
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. ADC0    : PC4 (AN14)
+;    2. Timer13 : PC3 (Output/Capture Input)
+;
+; E. Port Connection
+;    1. PC3 (Timer13 Output) ----> PC4 (AN14)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; ADC0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 p 64 ]
+;    Source                     : p (Peripheral Clock)
+;    Peripheral Clock Divide    : 64
+;
+; 3. Config                     : [ config 0 i s a 1 0 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : s (Single)
+;    Base Trigger Source        : a (ADC Instant Start)
+;    Sequence Count             : 1
+;    Sampling Time              : 0
+;
+; 4. Seq                        : [ 0 a 0 14 ]
+;    Trigger Source             : a (ADC Instant Start)
+;    Sequence Number            : 0
+;    Input Channel              : 14
+;
+; Timer13
+; 1. Channel                    : 3 (Timer13)
+;
+; 2. Clock                      : [ 3 m h 4 64 ]
+;    Source                     : m (MCCR : Misc Clock)
+;    MCCR Source                : h (HSI : High Speed Internal Clock - 48MHz)
+;    Source Divide              : 4 
+;    Timer1 Pre-Divide          : 64 (MCCR Clock / 4) / 64
+;
+; 3. Config                     : [ 3 i p h 13 13 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : p (Period)
+;    Output Port Polarity       : h (High)
+;    A Data                     : 13
+;    B Data                     : 13
+;
+; PCU (PC3)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 3 a 6 ]
+;    Pin Number                : 3
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 6 (T13OUT)
+;
+; PCU (PC4)
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 4 a 10 ]
+;    Pin Number                : 4
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 10 (AN14)
+;
+; PCU (PC3)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 2 3 a 6'
+mpause 30
+sendln 'port 2 8 a 0'
+mpause 30
+
+; PCU (PC4)
+sendln 'port 2 4 a 10'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 3'
+mpause 30
+sendln 'init 3'
+mpause 30
+sendln 'clk 3 m h 4 64'
+mpause 30
+sendln 'config 3 i p h 13 13' 
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 3'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 64'
+mpause 30
+sendln 'config 0 i s a 1 0'
+mpause 30
+sendln 'seq 0 a 0 14'
+mpause 30
+sendln 'start 0'
+pause 2
+sendln 'dump 0'

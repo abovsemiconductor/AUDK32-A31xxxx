@@ -1,0 +1,196 @@
+; A. Description
+;    A list of commands here configures timer4 and generates a capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer4
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer40 : PA0 (Output)
+;               : PB4 (Capture Input 1)
+;               : PC7 (Capture Input 2)
+;               : PC8 (Capture Input 3)
+;               : PC9 (External Clock Input)
+;
+;    2. Timer10 : PB14 (Output)
+;               : PA3 (Capture Input)
+;               : PB15 (External Clock Input)
+;
+;    3. Timer11 : PA6 (Output/Capture Input/External Clock Input)
+;
+;    4. Timer12 : PA7 (Output/Capture Input/External Clock Input)
+;
+; D. Port Connection
+;    1. PA6 (Timer10 Output) ----> PB0 (Timer40 Capture Input 1)
+;    2. PA6 (Timer11 Output) ----> PC7 (Timer40 Capture Input 2)
+;    3. PA7 (Timer12 Output) ----> PC8 (Timer40 Capture Input 3)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer40
+; 1. Channel                   : 0 (Timer40)
+;
+; 2. Clock                     : [ 0 m h 10 1000 ]
+;    Source                    : m ( MCCR : Misc Clock )
+;    MCCR Source               : h ( HSI : High Speed Internal Clock - 48MHz )
+;    Source Divide             : 10 
+;    Timer2 Pre-Divide         : 1000 ( MCCR Clock / 10 ) / 1000
+;
+; 3. Config                    : [ 0 i c r x 0 h 19200 19200 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : c (Capture)
+;    Capture Egde              : r (Rising)
+;    Capture Source            : x (XOR Capture Port Inputs)
+;    Counter Value             : 0 (Prescaler + 1)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 19200
+;    B Data                    : 192200
+;
+; Timer10
+; 1. Channel                   : 0 (Timer10)
+;
+; 2. Clock                     : [ 0 m h 10 1000 ]
+;    Source                    : m ( MCCR : Misc Clock )
+;    MCCR Source               : h ( HSI : High Speed Internal Clock - 48MHz )
+;    Source Divide             : 10 
+;    Timer1 Pre-Divide         : 1000 ( MCCR Clock / 10 ) / 1000
+;
+; 3. Config                    : [ 0 i p h 48000 48000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Periodic)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 48000
+;    B Data                    : 48000
+;
+; Timer11
+; 1. Channel                   : 1 (Timer11)
+;
+; 2. Clock                     : [ 1 m h 10 1000 ]
+;    Source                    : m ( MCCR : Misc Clock )
+;    MCCR Source               : h ( HSI : High Speed Internal Clock - 48MHz )
+;    Source Divide             : 10 
+;    Timer2 Pre-Divide         : 1000 ( MCCR Clock / 10 ) / 1000
+;
+; 3. Config                    : [ 1 i p h 48000 48000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 48000
+;    B Data                    : 48000
+;
+; Timer12
+; 1. Channel                   : 2 (Timer12)
+;
+; 2. Clock                     : [ 2 m h 10 1000 ]
+;    Source                    : m ( MCCR : Misc Clock )
+;    MCCR Source               : h ( HSI : High Speed Internal Clock - 48MHz )
+;    Source Divide             : 10 
+;    Timer2 Pre-Divide         : 1000 ( MCCR Clock / 10 ) / 1000
+;
+; 3. Config                    : [ 2 i p h 4800 4800 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Period)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 4800
+;    B Data                    : 4800
+;
+; PCU (PA/B)
+; 1. Port Group                : 0 / 1 (PCU Port A / B)
+;
+; 2. Port                      : [ 0 6 a 6 ] [ 0 7 a 6 ] [ 1 14 a 6 ]
+;    Pin Number                : 6 / 7 / 14
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 6 / 6 (T11OUT / T12OUT / T10OUT)
+; 
+; PCU (PB/C)
+; 1. Port Group                : 1 / 2 (PCU Port B / C)
+;
+; 2. Port                      : [ 1 4 a 7 ] [ 2 7 a 7 ] [ 2 8 a 7 ]
+;    Pin Number                : 4 / 7 / 8
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 7 (T40CAP_CH1/T40CAP_CH2/T40CAP_CH3)
+
+; PCU (PA/B)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 14 a 6'
+mpause 30
+sendln 'port 0 6 a 6'
+mpause 30
+sendln 'port 0 7 a 6'
+mpause 30
+
+; PCU (PB/C)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 4 a 7'
+mpause 30
+sendln 'port 2 7 a 7'
+mpause 30
+sendln 'port 2 8 a 7'
+mpause 30
+
+; Timer10
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i p h 48000 48000'
+mpause 30
+sendln 'log off'
+mpause 30
+
+; Timer11
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 m h 10 1000'
+mpause 30
+sendln 'config 1 i p h 48000 48000'
+mpause 30
+sendln 'log off'
+mpause 30
+
+; Timer12
+sendln 'uninit 2'
+mpause 30
+sendln 'init 2'
+mpause 30
+sendln 'clk 2 m h 10 1000'
+mpause 30
+sendln 'config 2 i p h 4800 4800'
+mpause 30
+
+; Timer40
+sendln 'cm timer4'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m h 10 1000'
+mpause 30
+sendln 'config 0 i c r x 0 h 19200 19200'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'
+mpause 30
+
+; Timer1
+sendln 'cm timer1'
+mpause 10
+sendln 'start 0'
+mpause 500
+sendln 'start 1'
+mpause 500
+sendln 'start 2'

@@ -1,0 +1,102 @@
+; A. Description
+;    A list of commands here configures timer2 and generates a capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer2
+;    2. Timer1
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer21 : PC0/PC0 (Output/Capture Input)
+;               : PC0 (External Clock Input)
+;    2. Timer14 : PC1/PC1 (Output/Capture Input)
+;               : PC1 (External Clock Input)
+;
+; E. Port Connection
+;    1. PC1 (Timer14 Output) ----> PC0 (Timer21 Capture Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer21
+; 1. Channel                   : 0 (Timer21)
+;
+; 2. Clock                     : [ 0 p 3999 ]
+;    Source                    : p (PCLK)
+;    Timer1 Pre-Divide         : 3999 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 0 i c b e d h 20000 20000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : c (Capture)
+;    Capture Egde              : b (Both)
+;    Capture Source            : e (Capture Port Input)
+;    Counter Mode              : d (Clear Count)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 20000
+;    B Data                    : 20000
+;
+; Timer14
+; 1. Channel                   : 3 (Timer14)
+;
+; 2. Clock                     : [ 3 p 0 3999 ]
+;    Source                    : p (PCLK)
+;    Source Divide             : 0 (Not available)
+;    Timer1 Pre-Divide         : 3999 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 3 i p h 10000 10000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : p (Periodic)
+;    Output Port Polarity      : h (High)
+;    A Data                    : 10000
+;    B Data                    : 10000
+;
+; PCU
+; 1. Port Group                : 2 (PCU Port C)
+;
+; 2. Port                      : [ 2 1 a 0 ] [ 2 0 a 1 ]
+;    Pin Number                : 1 / 0
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (T14OUT) / 1 (T21CAP)
+;
+; PCU (PC1)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 2 1 a 0'
+mpause 30
+
+; PCU(PC0)
+sendln 'port 2 0 a 1'
+mpause 30
+
+; Timer14
+sendln 'cm timer1'
+mpause 30
+sendln 'uninit 4'
+mpause 30
+sendln 'init 4'
+mpause 30
+sendln 'clk 4 p 0 3999'
+mpause 30
+sendln 'config 4 i p h 10000 10000'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 4'
+mpause 30
+
+; Timer21
+sendln 'cm timer2'
+mpause 30
+sendln 'uninit 1'
+mpause 30
+sendln 'init 1'
+mpause 30
+sendln 'clk 1 p 3999'
+mpause 30
+sendln 'config 1 i c b e d h 20000 20000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 1'

@@ -1,0 +1,37 @@
+; A. Description
+;    A list of commands here configures WDT and generates a reset.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. WDT
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; WDT0
+; 1. Channel                   : 0 (WDT 0)
+;
+; 2. Clock                     : [ 0 w 16 ]
+;    Clock Source              : w (WDTRC 40KHz)
+;    WDT Pre-Divide            : 16 (Clock Source / 16) 
+;
+; 3. Config                    : [ 0 i m r 20000 10000 ]
+;    Operation                 : i (Interrupt)
+;    Interrupt Mode            : m (Maskable)
+;    Mode                      : r (Reset)
+;    Inital Data               : 20000
+;    Match Data                : 10000
+;
+; WDT0
+sendln 'cm wdt'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 w 16'
+mpause 30
+sendln 'config 0 i m r 20000 10000'
+mpause 30
+sendln 'start 0'

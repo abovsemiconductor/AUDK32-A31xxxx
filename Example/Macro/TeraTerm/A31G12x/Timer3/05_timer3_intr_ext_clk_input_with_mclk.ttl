@@ -1,0 +1,89 @@
+; A. Description
+;    A list of commands here configures timer3 and generates a interval interrupt based on external clock source.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. Timer3
+;    2. SCUCLK
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. Timer30 : PE0 (PWM AA Output)
+;               : PE1 (PWM AB Output)
+;               : PE2 (PWM BA Output)
+;               : PE3 (PWM BB Output)
+;               : PE4 (PWM CA Output)
+;               : PE5 (PWM CB Output)
+;               : PF7 (Capture Input)
+;               : PF6 (External Clock Input)
+;               : PF5 (BLANK Input)
+;    2. PCU     : PF4 (Clock Output)
+;
+; E. Port Connection
+;    1. PF4 (Clock Output) ----> PF6 (Timer30 External Clock Input)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; Timer30
+; 1. Channel                   : 0 (Timer30)
+;
+; 2. Clock                     : [ 0 e f 0 ]
+;    Source                    : e (External Clock Input) 
+;    External Clock Input Edge : f (Falling) 
+;    Timer3 Pre-Divide         : 0 (No Pre-Divider available so default 0)
+;
+; 3. Config                    : [ 0 i i s 64000 14000 34000 54000 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Output Mode               : s (6-ch)
+;    Period                    : 64000
+;    A Data                    : 14000
+;    B Data                    : 34000
+;    C Data                    : 54000
+;
+; PCU
+; 1. Port Group                : 5 (PCU Port F) / 5 (PCU Port F)
+;
+; 2. Port                      : [ 5 4 a 1 ] [ 5 6 a 1 ]
+;    Pin Number                : 4 / 6
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (Clock Output) / 1 (EC30)
+;
+; SCUCLK
+; 1. Clock Out                 : [ clkout w 2 e ] 
+;    Clock Source              : w (MCLK - WDTRC 40KHz)
+;    Clock Source Divide       : 2 (Clock Source 2^N)
+;    Clock Output Enable       : e (Enable)
+;
+; PCU (PF4)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 5 4 a 1'
+mpause 30
+
+; PCU (PF6)
+sendln 'port 5 6 a 1'
+mpause 30
+
+; SCUCLK
+sendln 'cm scuclk'
+mpause 30
+sendln 'clkout w 2 e'
+mpause 30
+
+; Timer30
+sendln 'cm timer3'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 e f 0'
+mpause 30
+sendln 'config 0 i i s 40000 10000 20000 30000'
+mpause 30
+sendln 'log on'
+mpause 30
+sendln 'start 0'

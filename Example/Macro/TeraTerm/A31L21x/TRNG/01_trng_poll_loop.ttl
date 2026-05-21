@@ -1,0 +1,41 @@
+; A. Description
+;    A list of commands here configures TRNG module and generates a random number.
+;
+; B. Preparation
+;    N/A
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. TRNG
+;
+; Please, read the User Manual of the specific chip for more details.
+;
+; TRNG0
+; 1. Channel                   : 0 (TRNG0)
+;
+; 2. Config                    : [ 0 p l o 65535 ]
+;    Operation                 : p (Polling)
+;
+; 3. Gen                       : [ 0 e ]
+;    Generation Enable         : e (Enable)
+;
+; RNG0
+sendln 'cm trng'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'config 0 p'
+mpause 30
+sendln 'log on 5'
+mpause 30
+
+i = 0
+do while i < 16
+    i = i + 1
+    sendln 'gen 0 e'
+    mpause 200
+loop
+mpause 30
+sendln 'gen 0 d'
+

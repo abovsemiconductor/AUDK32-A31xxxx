@@ -1,0 +1,62 @@
+; A. Description
+;    A list of commands here configures I2C module as a slave and transmits data via I2C.
+;
+; B. Preparation
+;    Connecting ports with an external I2C device should be correct.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. I2C
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. I2C1    : PB1 (Serial Clock)
+;               : PB2 (Serial Data)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; I2C1
+; 1. Channel                   : 0 (I2C1)
+;
+; 2. Config                    : [ 0 i s 400000 -saddr 0x49]
+;    Operation                 : i (Interrupt)
+;    Mode                      : m (Master)
+;    Baudrate                  : 400000 (400KHz)
+;    Slave Address             : 0x49 (Hexa Format)
+;
+; 3. Data                      : [ 0 8 0xa5 0x5a 0xa5 0x5a 0x05 0x07 0x09 0xa0 ]
+;    Data Length               : 8
+;    Data                      : 0xa5 ... (Hexa and space (delimitor))
+;
+; 4. Tx                        : [ 0 8 ]
+;    Transmit Data Length      : 8
+;
+; PCU (I2C1)
+; 1. Port Group                : 1 (PCU Port B)
+;
+; 2. Port                      : [ 1 1 a 2 -pupd p ] [ 1 2 a 2 -pupd p ]
+;    Pin Number                : 1 / 2 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 2 (SCL/SDA)
+;    Pull-up/down              : p (Pull-up)
+;
+; PCU
+sendln 'cm pcu'
+mpause 30
+sendln 'port 1 1 a 2 -pupd p'
+mpause 30
+sendln 'port 1 2 a 2 -pupd p'
+mpause 30
+
+; I2C1
+sendln 'cm i2c'
+mpause 20
+sendln 'uninit 1'
+mpause 20
+sendln 'init 1'
+mpause 20
+sendln 'config 1 i s 400000 -saddr 0x49'
+mpause 20
+sendln 'data 1 8 0xa0 0x09 0x07 0x05 0x5a 0xa5 0x5a 0xa5'
+mpause 30
+mpause 20
+sendln 'tx 1 8'

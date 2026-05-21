@@ -1,0 +1,126 @@
+; A. Description
+;    A list of commands here configures ADC and generates single capture interrupt.
+;
+; B. Preparation
+;    Connecting target port with a suitable instrument.
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. ADC
+;    2. Timer4E
+;    3. PCU/GPIO
+;
+; D. Default Port
+;    1. ADC0    : PA4 (AN4)
+;               : PA5 (AN5)
+;               : PA6 (AN6)
+;    2. Timer4E3 : PA6/PA7/PA6 (Output A/B/Capture Input)
+;
+; E. Port Connection
+;    1. PA7 (Timer4E3 Output) ----> PA4 (AN4)
+;                             ----> PA5 (AN5)
+;                             ----> PA6 (AN6)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; ADC0
+; 1. Channel                    : 0
+;
+; 2. Clock                      : [ 0 p 15 ]
+;    Source                     : p (PCLK)
+;    Divide 		        : 15
+;
+; 3. Config                     : [ 0 i q 0 ]
+;    Operation                  : i (Interrupt)
+;    Mode                       : q (Sequence)
+;    Sampling Time              : 0
+;
+; 4. Seq                        : [ 0 a 0x70 ]
+;    Trigger Source             : a (ADC Instant Start)
+;    Input Channel              : 0x70
+;
+; Timer4E3
+; 1. Channel                   : 3 (Timer4E3)
+;
+; 2. Clock                     : [ 3 p 4095 ]
+;    Source                    : p (PCLK)
+;    Timer4e Pre-Divide        : 4095 (Pre-Divide + 1)
+;
+; 3. Config                    : [ 3 i i -port -pb en h 7812 3906 3906 ]
+;    Operation                 : i (Interrupt)
+;    Mode                      : i (Interval)
+;    Port                      : -pb (Port B)
+;    Port Output Enable        : en (Enable)
+;    Port Output Start Level   : h (High)
+;    Period                    : 7814
+;    A Data                    : 3907
+;    B Data                    : 3907
+;
+; PCU (PA7)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 7 a 0 ]
+;    Pin Number                : 7 
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 0 (T4E3OUT)
+;
+; PCU (PAx)
+; 1. Port Group                : 0 (PCU Port A)
+;
+; 2. Port                      : [ 0 4 a 4 ] [ 0 5 a 4 ] [ 0 6 a 4 ]
+;    Pin Number                : 4 / 5 / 6
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 4 (AN4/AN5/AN6)
+;
+; PCU (PA7)
+sendln 'cm pcu'
+mpause 30
+sendln 'port 0 7 a 0'
+mpause 30
+
+; PCU (PAx)
+sendln 'port 0 4 a 4'
+mpause 30
+sendln 'port 0 5 a 4'
+mpause 30
+sendln 'port 0 6 a 4'
+mpause 30
+
+; Timer4E0
+sendln 'cm timer4e'
+mpause 30
+sendln 'uninit 3'
+mpause 30
+sendln 'init 3'
+mpause 30
+sendln 'clk 3 p 4095'
+mpause 30
+sendln 'config 3 i i -port -pb en h 7812 3906 3906'
+mpause 30
+sendln 'log off'
+mpause 30
+sendln 'start 3'
+mpause 30
+
+; ADC0
+sendln 'cm adc'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 p 15'
+mpause 30
+sendln 'config 0 i q 0'
+mpause 30
+sendln 'seq 0 a 0x70'
+mpause 30
+sendln 'start 0'
+pause 2
+sendln 'dump 0'
+pause 1
+sendln 'stop 0'
+mpause 30
+
+sendln 'cm timer4e'
+mpause 30
+sendln 'stop 3'

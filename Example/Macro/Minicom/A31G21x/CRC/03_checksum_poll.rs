@@ -1,0 +1,71 @@
+# A. Description
+#    A list of commands here configures CRC module and generates a checksum result computed from specific data.
+#
+# B. Preparation
+#    N/A
+#
+# C. Prerequisite Example (abov_example_config.h)
+#    1. CRC 
+#
+# Please, read the User Manual of the specific chip for more details.
+#
+# CRC0
+# 1. Channel                   : 0 (CRC0)
+#
+# 2. Config                    : [ 0 p s m ]
+#    Operation                 : p (Polling)
+#    Mode                      : c (Checksum)
+#    First-In Bit              : m (MSB)
+#
+# 3. Data                      : [ 0 7 0x30 0x31 0x32 0x33 0x34 0x35 0x36 ]
+#    Data Length               : 7
+#    Data                      : 0x30 ... (Hexa and space (delimitor))
+#
+# Result of Checksum : 0x165
+#
+# CRC0
+send ""
+
+send "cm crc"
+expect {
+    "<CRC> # "
+    break
+    timeout 5 goto end
+}
+
+send "uninit 0"
+expect {
+    "<CRC> # "
+    break
+    timeout 5 goto end
+}
+
+send "init 0"
+expect {
+    "<CRC> # "
+    break
+    timeout 5 goto end
+}
+
+send "config 0 p s m"
+expect {
+    "<CRC> # "
+    break
+    timeout 5 goto end
+}
+
+send "data 0 7 0x30 0x31 0x32 0x33 0x34 0x35 0x36"
+expect {
+    "<CRC> # "
+    break
+    timeout 5 goto end
+}
+
+send "cmpt 0 7"
+expect {
+    "<CRC> # "
+    break
+    timeout 5 goto end
+}
+
+end:
