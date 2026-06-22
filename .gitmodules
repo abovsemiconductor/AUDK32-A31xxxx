@@ -16,3 +16,6 @@
 [submodule "Tool/OpenOCD"]
 	path = Tool/OpenOCD
 	url = https://github.com/abovsemiconductor/AUDK32-OpenOCD.git/
+[submodule "Platform/Library/U8g2"]
+	path = Platform/Library/U8g2
+	url = https://github.com/abovsemiconductor/u8g2.git
