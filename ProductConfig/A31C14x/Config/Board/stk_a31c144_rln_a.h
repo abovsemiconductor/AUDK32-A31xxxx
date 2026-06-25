@@ -21,6 +21,13 @@
 #define LAST_LED_ID                 5
 #define LED_PORT_ID                 4   /* Port E */
 
+#define USER_SW1_PORT               5   /* Port F */
+#define USER_SW1_PORT_ID            6
+#define USER_SW1_IRQ_NUM            GPIOEF_IRQn
+#define USER_SW2_PORT               5   /* Port F */
+#define USER_SW2_PORT_ID            7
+#define USER_SW2_IRQ_NUM            GPIOEF_IRQn
+
 /* Add your configuration */
 #define TIMER1_CLKSRC_USE_PCLK      0
 #define DEFAULT_HSE_1MHZ_DIV        8    /* 8MHz / 8 = 1MHz */

@@ -399,6 +399,22 @@
 
 #endif /* _MODULE_DMAC */
 
+#if defined(_MODULE_HSICMU)
+
+#define _HSICMU                          1
+
+/* DMA Maximum Channel Count */
+#define CONFIG_HSICMU_MAX_COUNT          1
+
+/* DMA IP version */
+#define CONFIG_HSICMU_VER_VENDOR        'V'
+#define CONFIG_HSICMU_VER_MAJOR          1
+#define CONFIG_HSICMU_VER_EXT            0
+#define CONFIG_HSICMU_VER_MINOR          0
+#define CONFIG_HSICMU_REG_NAME           0
+
+#endif /* _MODULE_HSICMU */
+
 /* Just in case of no register to give debugger connection */
 #define CONFIG_EMUL_JTAG_CONNECTION      0
 #if defined (EXTRN_FPA_CFMC) || defined (EXTRN_FPA_DFMC)

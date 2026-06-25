@@ -28,6 +28,12 @@
 #include "abov_module_config.h"
 #endif
 
+/* for abov simpleapp config */
+#if defined(EXTRN_ABOV_SIMPLEAPP_CONFIG)
+#undef ABOV_SIMPLEAPP_CONFIG_H
+#include "abov_simpleapp_config.h"
+#endif
+
 /*
  * Module Enable/Disable Control
  * XXX_BASE defines Chipset header file (a31xxxx.h) created by SVD file.
@@ -199,6 +205,11 @@
 /* FRT Module */
 #if (CONFIG_HAL_FRT == 1) && (defined(FRT0_BASE) || defined(FRT_BASE))
 #define _MODULE_FRT
+#endif
+
+/* HSICMU Module */
+#if (CONFIG_HAL_HSICMU == 1) && defined(HSICMU_BASE)
+#define _MODULE_HSICMU
 #endif
 
 /* COA Module */

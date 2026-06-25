@@ -21,11 +21,11 @@
 #define DEFAULT_HSE_1MHZ_DIV        8    /* 8MHz / 8 = 1MHz */
 
 /* I2C0 Port */
-#define I2C0_SCL_PORT               2    /* Port C */
-#define I2C0_SCL_PORT_ID            7
+#define I2C0_SCL_PORT               3    /* Port D */
+#define I2C0_SCL_PORT_ID            0
 #define I2C0_SCL_MUX_ID             1
-#define I2C0_SDA_PORT               2    /* Port C */
-#define I2C0_SDA_PORT_ID            8
+#define I2C0_SDA_PORT               3    /* Port D */
+#define I2C0_SDA_PORT_ID            1
 #define I2C0_SDA_MUX_ID             1
 
 /* SPI0 Port */

@@ -309,7 +309,7 @@
 //  <i>  * For a certain fuctionality, it can access System Flash located at inside of a device.
 #define EX_MULTI_FLASH       0
 
-// <q> COA (Configuration Option Aera : Only Watch-dog Timer and Low Voltage Reset)
+// <q> COA (Configuration Option Area : Only Watch-dog Timer and Low Voltage Reset)
 //  <i> - Configuration Option Area (COA) is used for configuring WDT and LVR system option.
 #define EX_MULTI_COA         0
 
@@ -331,6 +331,14 @@
 #define EX_MULTI_LED         0
 
 // </h> Display Group
+
+// <h> Miscellaneous Group
+
+// <q> HSICMU (High-Speed Internal OSC Clock Management Unit)
+//  <i> - The High-Speed Internal OSC Clock Management Unit (HSICMU) is designed for the auto-trimming of the Internal OSC clock.
+#define EX_MULTI_HSICMU      0
+
+// </h> Miscellaneous Group
 
 // </h> End of ABOV example configuration
 
@@ -443,6 +451,9 @@
 #endif
 #if (EX_MULTI_FRT == 1)
 #define FRT_TC
+#endif
+#if (EX_MULTI_HSICMU == 1)
+#define HSICMU_TC
 #endif
 
 #endif
@@ -570,6 +581,10 @@
 
 #if defined(FRT_TC)
 #define CONFIG_HAL_FRT         1
+#endif
+
+#if defined(HSICMU_TC)
+#define CONFIG_HAL_HSICMU      1
 #endif
 
 #endif /* _EXAMPLE_CONFIG_H_ */

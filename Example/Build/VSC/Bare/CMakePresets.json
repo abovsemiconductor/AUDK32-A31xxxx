@@ -1,0 +1,139 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "AUDK32",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build",
+            "generator": "Ninja",
+            "environment": {
+                "PATH": "${sourceDir}/../../../../Tool/Ninja;$penv{PATH}"
+            },
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/../toolchain-gcc.cmake",
+                "PROJECT":"Bare",
+                "PRODUCT":"A31xxxx"
+            }
+        },
+        {
+            "name": "A31C12x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31C12x",
+                "TARGET_BOARD":"A31C122-KYN"
+            }
+        },
+        {
+            "name": "A31C14x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31C14x",
+                "TARGET_BOARD":"A31C144-RLN"
+            }
+        },
+        {
+            "name": "A31G11x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G11x",
+                "TARGET_BOARD":"A31G112-CLN"
+            }
+        },
+        {
+            "name": "A31G12x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G12x",
+                "TARGET_BOARD":"A31G123-MLN"
+            }
+        },
+        {
+            "name": "A31G21x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G21x",
+                "TARGET_BOARD":"A31G213-CL2N"
+            }
+        },
+        {
+            "name": "A31G22x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G22x",
+                "TARGET_BOARD":"A31G226-ML2N"
+            }
+        },
+        {
+            "name": "A31G31x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G31x",
+                "TARGET_BOARD":"A31G314-MMN"
+            }
+        },
+        {
+            "name": "A31G32x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G32x",
+                "TARGET_BOARD":"A31G324-RLN"
+            }
+        },
+        {
+            "name": "A31G33x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G33x",
+                "TARGET_BOARD":"A31G336-RLN"
+            }
+        },
+        {
+            "name": "A31G34x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31G34x",
+                "TARGET_BOARD":"A31G346-RLN"
+            }
+        },
+        {
+            "name": "A31L12x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31L12x",
+                "TARGET_BOARD":"A31L123-RLN"
+            }
+        },
+        {
+            "name": "A31L21x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31L21x",
+                "TARGET_BOARD":"A31L214-MLN"
+            }
+        },
+        {
+            "name": "A31L22x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31L22x",
+                "TARGET_BOARD":"A31L222-FRN"
+            }
+        },
+        {
+            "name": "A31S13x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31S13x",
+                "TARGET_BOARD":"A31S134-RLN"
+            }
+        },
+        {
+            "name": "A31T21x",
+            "inherits": "AUDK32",
+            "cacheVariables": {
+                "AUDK32_TARGET": "A31T21x",
+                "TARGET_BOARD":"A31T216-RLN"
+            }
+        }
+    ]
+}

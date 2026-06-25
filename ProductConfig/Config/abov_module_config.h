@@ -291,6 +291,14 @@
 
 // </h> Display Group
 
+// <h> Miscellaneous Group
+
+// <q> HSICMU (High-Speed Internal OSC Clock Management Unit)
+//  <i> - The High-Speed Internal OSC Clock Management Unit (HSICMU) is designed for the auto-trimming of the Internal OSC clock.
+#define CONFIG_HAL_HSICMU      0
+
+// </h> Miscellaneous Group
+
 // </h> End of ABOV Module Configuration
 
 /*

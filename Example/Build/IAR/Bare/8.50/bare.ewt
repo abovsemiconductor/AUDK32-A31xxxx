@@ -22240,6 +22240,9 @@
             <name>$PROJ_DIR$\..\..\..\..\Source\Bare\Peripheral\FRT\frt.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\..\..\Source\Bare\Peripheral\HSICMU\hsicmu.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\..\..\Source\Bare\Peripheral\I2C\i2c.c</name>
         </file>
         <file>
@@ -22340,6 +22343,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\Platform\HAL\FRT\hal_frt.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\..\..\..\Platform\HAL\HSICMU\hal_hsicmu.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\..\Platform\HAL\I2C\hal_i2c.c</name>

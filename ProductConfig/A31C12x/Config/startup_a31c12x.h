@@ -120,12 +120,12 @@ RAMFUNC static __inline CONFIG_FLASH_INFO_t PRV_CHIPSET_GetFlashGeometricInfo(vo
         case 0x43311220: /* A31C122 */
             tFlashGeometricInfo.un32CflashSize = 0x8000;
             tFlashGeometricInfo.un32SystemFlashSize = 0x800;
-            tFlashGeometricInfo.un32CflashWProtectedSegSize = 0x1800;
+            tFlashGeometricInfo.un32CflashWProtectedSegSize = 0x800;
             break;
         case 0x43311210: /* A31C121 */
             tFlashGeometricInfo.un32CflashSize = 0x4000;
             tFlashGeometricInfo.un32SystemFlashSize = 0x800;
-            tFlashGeometricInfo.un32CflashWProtectedSegSize = 0x1800;
+            tFlashGeometricInfo.un32CflashWProtectedSegSize = 0x800;
             break;
         default:
             tFlashGeometricInfo.un32CflashSize = 0;

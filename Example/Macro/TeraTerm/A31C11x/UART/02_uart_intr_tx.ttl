@@ -1,0 +1,61 @@
+; A. Description
+;    A list of commands here configures UART and transmits data.
+;
+; B. Preparation
+;    Connecting ports with a suitable instrument should be correct
+;
+; C. Prerequisite Example (abov_example_config.h)
+;    1. UART
+;    2. PCU/GPIO
+;
+; D. Default Port
+;    1. UART0   : PF0 (Transmit)
+;               : PF1 (Receive)
+;
+; For more information, read a user's manual of the target device carefully.
+;
+; UART0
+; 1. Channel                   : 0 (UART0)
+;
+; 2. CLK                       : [ 0 m m 2 ]
+;    Source                    : m (MCCR : Misc Clock)
+;    MCCR Source               : m (MCLK : Main Clock)
+;    Source Divide             : 2
+;
+; 3. Config                    : [ 0 i 8 o 1 38400 ]
+;    Operation                 : i (Interrupt)
+;    Data Bit                  : 8 (8bit)
+;    Parity                    : o (odd)
+;    Stop Bit                  : 1 (1bit)
+;    Baudrate                  : 38400 bps
+;
+; 4. Data                      : [ 0 8 0xa5 0x5a 0xa5 0x5a 0x05 0x07 0x09 0xa0 ]
+;    Data Length               : 8
+;    Data                      : 0xa5 ... (Hexa and space (delimitor))
+;
+; 5. Tx                        : [ 0 8 ]
+;    Receive Data Length       : 8
+;
+; PCU (PFx)
+; 1. Port Group                : 5 (PCU Port F)
+;
+; 2. Port                      : [ 5 0 a 1 -pupd p ] [ 5 1 a 1 -pupd p ]
+;    Pin Number                : 0 / 1
+;    Pin Mode                  : a (Alternative)
+;    Alternative               : 1 (TX/RX)
+;    Pull-up/down              : p (Pull-up)
+;
+; UART1
+sendln 'cm uart'
+mpause 30
+sendln 'uninit 0'
+mpause 30
+sendln 'init 0'
+mpause 30
+sendln 'clk 0 m m 2'
+mpause 30
+sendln 'config 0 i 8 o 1 38400'
+mpause 30
+sendln 'data 0 8 0xa5 0x5a 0xa5 0x5a 0x05 0x07 0x09 0xa0'
+mpause 30
+sendln 'tx 0 8'
